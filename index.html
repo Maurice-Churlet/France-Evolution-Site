@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+	<!-- Google Tag Manager -->
+	<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+	new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+	j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+	'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+	})(window,document,'script','dataLayer','GTM-PNFM7H8Q');</script>
+	<!-- End Google Tag Manager -->
+	
+	<!-- Title tag (60 caractères max, mot-clé au début) -->
+	<title>Évolution de la France par Présidence | Données et Classements 2025</title>
+
+	<!-- Meta Description (140-160 caractères, bénéfice + appel à l’action) -->
+	<meta name="description" content="Découvrez l’évolution de la France sous chaque président : dépenses publiques, classements mondiaux, santé, éducation, économie. Comparez les tendances et explorez les données clés.">
+
+	<!-- Robots (pour indexation) -->
+	<meta name="robots" content="index, follow">
+
+	<!-- Canonical (évite le contenu dupliqué, à adapter si besoin) -->
+	<link rel="canonical" href="https://franceevolution.netlify.app/">
+
+	<!-- Viewport (expérience mobile) -->
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<!-- Charset -->
+	<meta charset="UTF-8">
+
+	<!-- Open Graph pour Facebook et réseaux sociaux -->
+	<meta property="og:title" content="Évolution de la France par Présidence | Données et Classements 2025">
+	<meta property="og:description" content="Comparez l’évolution de la France sous chaque président : dépenses publiques, classements mondiaux, santé, éducation, économie.">
+	<meta property="og:url" content="https://franceevolution.netlify.app/">
+	<meta property="og:type" content="website">
+	<meta property="og:image" content="https://franceevolution.netlify.app/dette.jpg"> <!-- À adapter à ton image de partage -->
+
+	<!-- Twitter Card -->
+	<meta name="twitter:card" content="summary_large_image">
+	<meta name="twitter:title" content="Évolution de la France par Présidence | Données et Classements 2025">
+	<meta name="twitter:description" content="Découvrez les tendances de la France sous chaque président : dépenses publiques, classements mondiaux, et plus.">
+	<meta name="twitter:image" content="https://franceevolution.netlify.app/dette.jpg"> <!-- À adapter -->
+  
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://fonts.googleapis.com/css?family=Marianne,Roboto:400,700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bleu-republique: #14387f;
+      --bleu-fonce: #1b2b4f;
+      --bleu-clair: #eaf0fa;
+      --rouge-republique: #e1000f;
+      --blanc: #fff;
+      --gris-clair: #f5f7fa;
+      --gris: #dbe2ef;
+    }
+    body {
+      font-family: 'Marianne', 'Roboto', Arial, sans-serif;
+      background: var(--gris-clair);
+      margin: 0; padding: 0;
+    }
+    .fr-header {
+      background: linear-gradient(90deg, var(--bleu-republique) 70%, var(--rouge-republique) 100%);
+      color: var(--blanc);
+      padding: 24px 0 16px 0;
+      text-align: center;
+      margin-bottom: 32px;
+      box-shadow: 0 2px 6px #0001;
+    }
+    .fr-header h1 {
+      margin: 0;
+      font-size: 2.2em;
+      letter-spacing: 1px;
+      font-weight: 700;
+      text-shadow: 0 1px 2px #0003;
+    }
+    .fr-container {
+      max-width: 950px;
+      margin: auto;
+      background: var(--blanc);
+      padding: 32px 20px 32px 20px;
+      border-radius: 14px;
+      box-shadow: 0 4px 20px #14387f18;
+    }
+    h2, h3 {
+      color: var(--bleu-republique);
+      margin-top: 2.2em;
+      margin-bottom: .7em;
+      font-weight: 700;
+    }
+    h2 { font-size: 1.5em; }
+    h3 { font-size: 1.15em; }
+    p, ul { color: #222; }
+    select {
+      font-size: 1em;
+      border: 1px solid var(--bleu-republique);
+      border-radius: 4px;
+      padding: 5px 10px;
+      background: var(--blanc);
+      color: var(--bleu-republique);
+      margin-left: 8px;
+      margin-bottom: 12px;
+    }
+    .chart-container {
+      background: var(--bleu-clair);
+      border-radius: 10px;
+      padding: 18px 12px 8px 12px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px #14387f09;
+    }
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin-bottom: 32px;
+      background: var(--blanc);
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 6px #14387f0c;
+    }
+    th, td {
+      padding: 8px 8px;
+      border-bottom: 1px solid var(--gris);
+      text-align: left;
+    }
+    th {
+      background: var(--bleu-republique);
+      color: var(--blanc);
+      font-weight: 700;
+      font-size: 1em;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--bleu-clair); }
+    .president-title {
+      color: var(--bleu-fonce);
+      background: linear-gradient(90deg, var(--bleu-clair) 80%, var(--rouge-republique) 100%);
+      padding: 8px 0 8px 12px;
+      border-radius: 6px;
+      font-weight: 700;
+      margin: 32px 0 6px 0;
+      font-size: 1.08em;
+    }
+    .explication {
+      background: var(--bleu-clair);
+      color: var(--bleu-republique);
+      border-left: 4px solid var(--bleu-republique);
+      border-radius: 5px;
+      padding: 10px 16px;
+      margin-bottom: 18px;
+      margin-top: 8px;
+      font-size: 1em;
+    }
+    .conclusions {
+      background: linear-gradient(90deg, var(--bleu-clair) 85%, var(--rouge-republique) 100%);
+      border-radius: 8px;
+      padding: 18px 16px;
+      margin-top: 32px;
+      box-shadow: 0 2px 8px #14387f0a;
+    }
+    .conclusions ul {
+      margin-top: 0;
+      margin-bottom: 12px;
+    }
+    .conclusions li {
+      margin-bottom: 6px;
+    }
+    @media (max-width: 700px) {
+      .fr-container {padding: 12px;}
+      .fr-header {font-size: 1em;}
+      th, td {font-size: .97em;}
+    }
+	.fr-footer {
+	  background: var(--bleu-republique);
+	  color: var(--blanc);
+	  padding: 24px 0 18px 0;
+	  text-align: center;
+	  font-size: 1.1em;
+	  margin-top: 40px;
+	}
+	.fr-footer__content {
+	  max-width: 950px;
+	  margin: auto;
+	}
+	.fr-footer {
+	  background: var(--bleu-republique);
+	  color: var(--blanc);
+	  margin-top: 48px;
+	  font-size: 1.08em;
+	  box-shadow: 0 -1px 6px #14387f18;
+	}
+	.fr-footer__content {
+	  max-width: 1050px;
+	  margin: 0 auto;
+	  padding: 38px 32px 18px 32px;
+	}
+	.fr-footer__row {
+	  display: flex;
+	  justify-content: space-between;
+	  gap: 40px;
+	  flex-wrap: wrap;
+	}
+	.fr-footer__col {
+	  min-width: 260px;
+	  flex: 1 1 0;
+	}
+	.fr-footer__title {
+	  font-weight: 700;
+	  font-size: 1.18em;
+	  margin-bottom: 2px;
+	  color: var(--blanc);
+	}
+	.fr-footer__desc {
+	  font-size: 1em;
+	  color: #eaf0fa;
+	  margin-bottom: 10px;
+	}
+	.fr-footer__divider {
+	  border: none;
+	  border-top: 1px solid #2950a7;
+	  margin: 28px 0 16px 0;
+	}
+	.fr-footer__copyright {
+	  text-align: center;
+	  color: #eaf0fa;
+	  font-size: 0.98em;
+	  margin-bottom: 4px;
+	}
+	@media (max-width: 800px) {
+	  .fr-footer__row {
+		flex-direction: column;
+		gap: 0;
+	  }
+	  .fr-footer__content {
+		padding: 28px 10px 12px 10px;
+	  }
+	}
+</style>
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PNFM7H8Q"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+  <div class="fr-header">
+    <h1>La France de 1959 à 2025</h1>
+    <div style="font-size:1.1em; font-weight:400; margin-top:10px;">
+      Évolution des politiques publiques sous la Ve République
+    </div>
+  </div>
+  <div class="fr-container">
+            <li><a href="dette_presidents.html">Dette publique</a></li>
+          <li><a href="sources.html">Sources</a></li>
+    <p>
+      Cette plateforme présente l'évolution de la France sous différentes présidences, de Charles de Gaulle à Emmanuel Macron, à travers plusieurs indicateurs clés : les dépenses publiques (en pourcentage du PIB) et le classement mondial dans des domaines stratégiques comme l'éducation, la santé, l'économie, la défense et la recherche.
+    </p>
+
+    <h2>Graphiques interactifs</h2>
+    <h3>Évolution des dépenses publiques par domaine (1959-2025)</h3>
+    <label for="domaine"><b>Domaine :</b></label>
+    <select id="domaine">
+      <option value="education">Éducation</option>
+      <option value="sante">Santé</option>
+      <option value="defense">Défense</option>
+      <option value="recherche">Recherche</option>
+      <option value="economie">Économie (classement uniquement)</option>
+    </select>
+    <div class="chart-container">
+      <canvas id="graphique"></canvas>
+    </div>
+    <div id="explication" class="explication"></div>
+
+    <h2>Tableaux détaillés par présidence</h2>
+    <div id="tableaux"></div>
+
+    <h2>Conclusions et tendances</h2>
+    <div class="conclusions">
+      <ul>
+        <li><b>Augmentation des dépenses de santé :</b> Forte hausse continue de 4,2% à 12,1% du PIB entre 1959 et 2025, reflétant le vieillissement de la population et les progrès médicaux.</li>
+        <li><b>Stabilité relative en éducation :</b> Dépenses stabilisées autour de 5,5% du PIB depuis les années 1990, mais recul du classement mondial.</li>
+        <li><b>Baisse continue en défense :</b> Diminution marquée de 5,2% à 2,25% du PIB, avec un léger redressement sous Macron pour atteindre 2,5%.</li>
+        <li><b>Stagnation en recherche :</b> Investissement en R&D oscillant autour de 2-2,2% du PIB depuis les années 1980, avec un décrochage dans le classement mondial.</li>
+		<li><b>Dette :</b> La dette publique française, en forte hausse depuis les années 1980, atteint aujourd’hui un niveau record. Cette évolution limite les marges de manœuvre budgétaires et pose la question de la soutenabilité du modèle français à long terme.
+		</li>		
+      </ul>
+      <p>
+        Ces tendances suggèrent un modèle français qui a progressivement réorienté ses priorités des fonctions régaliennes (défense) vers les dépenses sociales (santé), tout en maintenant un effort relativement constant en éducation et recherche, mais insuffisant pour préserver son rang mondial face à la montée de nouvelles puissances.
+      </p>
+    </div>
+	<P></p><li><a href="dette_presidents.html">Dette publique</a></li>
+  </div>
+<script>
+// Données pour les graphiques
+const data = {
+  education: [
+    { name: "De Gaulle (1959-1969)", depenses: 4.2, classement: 15 },
+    { name: "Pompidou (1969-1974)", depenses: 4.9, classement: 13 },
+    { name: "Giscard (1974-1981)", depenses: 5.1, classement: 12 },
+    { name: "Mitterrand (1981-1995)", depenses: 5.5, classement: 10 },
+    { name: "Chirac (1995-2007)", depenses: 5.7, classement: 14 },
+    { name: "Sarkozy (2007-2012)", depenses: 5.5, classement: 17 },
+    { name: "Hollande (2012-2017)", depenses: 5.5, classement: 19 },
+    { name: "Macron (2017-2025)", depenses: 5.3, classement: 22 }
+  ],
+  sante: [
+    { name: "De Gaulle (1959-1969)", depenses: 4.8, classement: 12 },
+    { name: "Pompidou (1969-1974)", depenses: 5.5, classement: 10 },
+    { name: "Giscard (1974-1981)", depenses: 6.4, classement: 8 },
+    { name: "Mitterrand (1981-1995)", depenses: 8.4, classement: 6 },
+    { name: "Chirac (1995-2007)", depenses: 10.4, classement: 7 },
+    { name: "Sarkozy (2007-2012)", depenses: 11.1, classement: 9 },
+    { name: "Hollande (2012-2017)", depenses: 11.4, classement: 10 },
+    { name: "Macron (2017-2025)", depenses: 11.8, classement: 12 }
+  ],
+  defense: [
+    { name: "De Gaulle (1959-1969)", depenses: 5.0, classement: 3 },
+    { name: "Pompidou (1969-1974)", depenses: 3.9, classement: 4 },
+    { name: "Giscard (1974-1981)", depenses: 3.5, classement: 4 },
+    { name: "Mitterrand (1981-1995)", depenses: 3.1, classement: 4 },
+    { name: "Chirac (1995-2007)", depenses: 2.7, classement: 5 },
+    { name: "Sarkozy (2007-2012)", depenses: 2.3, classement: 6 },
+    { name: "Hollande (2012-2017)", depenses: 2.3, classement: 6 },
+    { name: "Macron (2017-2025)", depenses: 2.4, classement: 7 }
+  ],
+  recherche: [
+    { name: "De Gaulle (1959-1969)", depenses: 1.6, classement: 8 },
+    { name: "Pompidou (1969-1974)", depenses: 1.9, classement: 8 },
+    { name: "Giscard (1974-1981)", depenses: 1.8, classement: 9 },
+    { name: "Mitterrand (1981-1995)", depenses: 2.0, classement: 8 },
+    { name: "Chirac (1995-2007)", depenses: 2.1, classement: 9 },
+    { name: "Sarkozy (2007-2012)", depenses: 2.2, classement: 11 },
+    { name: "Hollande (2012-2017)", depenses: 2.2, classement: 12 },
+    { name: "Macron (2017-2025)", depenses: 2.2, classement: 13 }
+  ],
+  economie: [
+    { name: "De Gaulle (1959-1969)", depenses: null, classement: 6 },
+    { name: "Pompidou (1969-1974)", depenses: null, classement: 6 },
+    { name: "Giscard (1974-1981)", depenses: null, classement: 5 },
+    { name: "Mitterrand (1981-1995)", depenses: null, classement: 6 },
+    { name: "Chirac (1995-2007)", depenses: null, classement: 7 },
+    { name: "Sarkozy (2007-2012)", depenses: null, classement: 6 },
+    { name: "Hollande (2012-2017)", depenses: null, classement: 6 },
+    { name: "Macron (2017-2025)", depenses: null, classement: 8 }
+  ]
+};
+
+const explications = {
+  education: "L'effort budgétaire pour l'éducation a augmenté jusqu'au milieu des années 90 pour ensuite se stabiliser autour de 5,5% du PIB. Cependant, malgré ces dépenses relativement stables, le classement mondial de la France s'est dégradé progressivement, passant du top 10 à une position autour de la 20ème place.",
+  sante: "Les dépenses de santé ont connu une forte augmentation, passant d'environ 5% à près de 12% du PIB entre 1959 et 2025. Paradoxalement, malgré cette hausse continue des dépenses, la position mondiale de la France s'est légèrement dégradée depuis les années 2000, suggérant des problèmes d'efficience du système de santé.",
+  defense: "Les dépenses de défense ont fortement diminué depuis l'ère de Gaulle (5% du PIB) jusqu'aux années 2010 (2,3%). Un léger rebond est observable sous la présidence Macron. Ce désengagement progressif s'est traduit par un recul dans le classement mondial, la France passant de la 3ème à la 7ème place.",
+  recherche: "Les dépenses en recherche et développement sont relativement stables depuis les années 80, autour de 2-2,2% du PIB. Toutefois, la position mondiale de la France s'est détériorée, suggérant un effort insuffisant par rapport à d'autres pays qui investissent davantage dans l'innovation.",
+  economie: "La position économique mondiale de la France s'est globalement maintenue entre la 5ème et la 8ème place, avec une tendance au léger recul sur la période récente. Ce phénomène reflète principalement l'émergence de nouvelles puissances économiques (Chine, Inde, Brésil) plutôt qu'un déclin absolu.<br><b>Note :</b> Pour l'économie, seul le classement du PIB nominal est représenté."
+};
+
+let chart;
+function updateChart(domaine) {
+  const ctx = document.getElementById('graphique').getContext('2d');
+  const d = data[domaine];
+  const labels = d.map(x => x.name);
+  const classement = d.map(x => x.classement);
+  const depenses = d.map(x => x.depenses);
+
+  if(chart) chart.destroy();
+
+  const datasets = [];
+  if(domaine !== 'economie') {
+    datasets.push({
+      label: 'Dépenses (% PIB)',
+      data: depenses,
+      borderColor: '#14387f',
+      backgroundColor: 'rgba(20,56,127,0.08)',
+      pointBackgroundColor: '#14387f',
+      yAxisID: 'y',
+      spanGaps: true,
+      tension: 0.35
+    });
+  }
+  datasets.push({
+    label: 'Classement mondial',
+    data: classement,
+    borderColor: '#e1000f',
+    backgroundColor: 'rgba(225,0,15,0.08)',
+    pointBackgroundColor: '#e1000f',
+    yAxisID: 'y1',
+    tension: 0.35
+  });
+
+  chart = new Chart(ctx, {
+    type: 'line',
+    data: { labels, datasets },
+    options: {
+      responsive: true,
+      interaction: { mode: 'index', intersect: false },
+      stacked: false,
+      plugins: { legend: { position: 'top' } },
+      scales: {
+        y: {
+          type: 'linear',
+          display: domaine !== 'economie',
+          position: 'left',
+          title: { display: true, text: '% du PIB', color: '#14387f' },
+          grid: { color: '#eaf0fa' },
+          ticks: { color: '#14387f' }
+        },
+        y1: {
+          type: 'linear',
+          display: true,
+          position: 'right',
+          reverse: true,
+          title: { display: true, text: 'Classement mondial (plus bas = mieux)', color: '#e1000f' },
+          grid: { drawOnChartArea: false },
+          ticks: { color: '#e1000f' }
+        }
+      }
+    }
+  });
+
+  document.getElementById('explication').innerHTML = explications[domaine];
+}
+
+document.getElementById('domaine').addEventListener('change', function() {
+  updateChart(this.value);
+});
+updateChart('education');
+
+// Tableaux détaillés par présidence
+const tableaux = [
+  {
+    president: "Charles de Gaulle (1959-1969)",
+    data: [
+      ["Éducation", "3,5% → 4,8%", "~15ème", "Réforme de l'enseignement supérieur, création des IUT"],
+      ["Santé", "4,2% → 5,3%", "~12ème", "Création des CHU, développement du système de sécurité sociale"],
+      ["Économie", "N/A", "~6ème", '"Trente Glorieuses", croissance moyenne de 5%'],
+      ["Défense", "5,2% → 4,8%", "3ème", "Développement de la force de frappe nucléaire"],
+      ["Recherche", "1,4% → 1,8%", "~8ème", "Création du CNES, développement aérospatial"],
+	  ["Dette", "25% → 15%", "~140ᵉ", "Baisse de 10 points du PIB sur le mandat"]
+    ]
+  },
+  {
+    president: "Georges Pompidou (1969-1974)",
+    data: [
+      ["Éducation", "4,8% → 5,0%", "~13ème", "Poursuite des réformes universitaires"],
+      ["Santé", "5,3% → 5,7%", "~10ème", "Amélioration de la couverture sociale"],
+      ["Économie", "N/A", "~6ème", "Croissance moyenne de 5,2%"],
+      ["Défense", "4,0% → 3,7%", "4ème", "Modernisation des forces conventionnelles"],
+      ["Recherche", "1,8% → 1,9%", "~8ème", "Développement technologique et industriel"],
+	  ["Dette", "15% → 14,5%", "~130ᵉ", "Baisse de 0,5 point du PIB sur le mandat"]
+    ]
+  },
+  {
+    president: "Valéry Giscard d'Estaing (1974-1981)",
+    data: [
+      ["Éducation", "5,0% → 5,1%", "~12ème", "Réforme du collège unique (Haby)"],
+      ["Santé", "5,7% → 7,0%", "~8ème", "Extension de la sécurité sociale"],
+      ["Économie", "N/A", "~5ème", "Chocs pétroliers, début de la crise économique"],
+      ["Défense", "3,7% → 3,3%", "4ème", "Restructuration des industries d'armement"],
+      ["Recherche", "1,9% → 1,8%", "~9ème", "Développement du programme nucléaire civil"],
+	  ["Dette", "14,5% → 21%", "~120ᵉ", "Hausse de 6,5 points du PIB sur le mandat"]
+    ]
+  },
+  {
+    president: "François Mitterrand (1981-1995)",
+    data: [
+      ["Éducation", "5,1% → 5,9%", "~10ème", "Objectif 80% au bac, création des IUFM"],
+      ["Santé", "7,0% → 9,8%", "~6ème", "CMU, amélioration de l'accès aux soins"],
+      ["Économie", "N/A", "~5ème → ~7ème", "Nationalisations puis privatisations, crise de 1993"],
+      ["Défense", "3,3% → 3,0%", "4ème", "Modernisation de la dissuasion nucléaire"],
+      ["Recherche", "1,8% → 2,2%", "~8ème", "Grands programmes technologiques (TGV, Ariane)"],
+	  ["Dette", "21% → 56%", "~50ᵉ", "Hausse de 35 points du PIB sur le mandat"]
+    ]
+  },
+  {
+    president: "Jacques Chirac (1995-2007)",
+    data: [
+      ["Éducation", "5,9% → 5,6%", "12ème → 15ème", "Réformes des universités et de l'enseignement pro"],
+      ["Santé", "9,8% → 10,9%", "6ème → 8ème", "Instauration de la CMU, réforme hospitalière"],
+      ["Économie", "N/A", "7ème → 6ème", "Adoption de l'euro, croissance modérée"],
+      ["Défense", "3,0% → 2,4%", "4ème → 5ème", "Fin du service militaire, professionnalisation"],
+      ["Recherche", "2,2% → 2,1%", "8ème → 10ème", "Relative stagnation, début du décrochage"],
+	  ["Dette", "56% → 65%", "~35ᵉ", "Hausse de 9 points du PIB sur le mandat"]
+    ]
+  },
+  {
+    president: "Nicolas Sarkozy (2007-2012)",
+    data: [
+      ["Éducation", "5,6% → 5,5%", "15ème → 18ème", "Autonomie des universités, réduction postes"],
+      ["Santé", "10,9% → 11,3%", "8ème → 10ème", "Loi HPST, crise des hôpitaux"],
+      ["Économie", "N/A", "6ème → 5ème", "Crise financière de 2008, plans de relance"],
+      ["Défense", "2,4% → 2,3%", "5ème → 6ème", "Réintégration dans l'OTAN, réduction du format"],
+      ["Recherche", "2,1% → 2,2%", "10ème → 12ème", "Programme Investissements d'Avenir"],
+	  ["Dette", "65% → 91%", "~20ᵉ", "Hausse de 26 points du PIB sur le mandat"]
+    ]
+  },
+  {
+    president: "François Hollande (2012-2017)",
+    data: [
+      ["Éducation", "5,5% → 5,4%", "18ème → 20ème", "Réforme des rythmes scolaires, création postes"],
+      ["Santé", "11,3% → 11,5%", "10ème → 11ème", "Loi Santé, tiers payant"],
+      ["Économie", "N/A", "5ème → 7ème", "Pacte de responsabilité, crédit d'impôt compétitivité"],
+      ["Défense", "2,3% → 2,25%", "6ème → 6ème", "Opérations extérieures (Mali, Syrie)"],
+      ["Recherche", "2,2% → 2,3%", "12ème → 11ème", "Légère hausse des investissements"],
+	  ["Dette", "91% → 99%", "~15ᵉ", "Hausse de 8 points du PIB sur le mandat"]
+    ]
+  },
+  {
+    president: "Emmanuel Macron (2017-2025)",
+    data: [
+      ["Éducation", "5,4% → 5,3%", "20ème → 23ème", "Réformes du baccalauréat, dédoublement CP/CE1 en REP"],
+      ["Santé", "11,5% → 12,1%", "11ème → 13ème", "Plan Ma Santé 2022, gestion Covid-19, Ségur"],
+      ["Économie", "N/A", "7ème → 8ème", "Réformes du travail et de la fiscalité, Covid, inflation"],
+      ["Défense", "2,25% → 2,5%", "6ème → 7ème", "Hausse budget, Loi de programmation 2.0% OTAN"],
+      ["Recherche", "2,3% → 2,1%", "11ème → 15ème", "Loi de Programmation Recherche, crédits d'innovation"],
+	  ["Dette", "99% → 111%", "~12ᵉ", "Hausse de 12 points du PIB sur le mandat (estimation 2024)"]
+    ]
+  }
+];
+
+let html = '';
+for (const pres of tableaux) {
+  html += `<div class="president-title">${pres.president}</div><table><thead><tr>
+    <th>Domaine</th><th>Dépenses (% du PIB)</th><th>Classement mondial</th><th>Notes</th>
+    </tr></thead><tbody>`;
+  for (const row of pres.data) {
+    html += `<tr>${row.map(cell => `<td>${cell}</td>`).join('')}</tr>`;
+  }
+  html += `</tbody></table>`;
+}
+document.getElementById('tableaux').innerHTML = html;
+</script>
+	<footer class="fr-footer">
+	  <div class="fr-footer__content">
+		<div class="fr-footer__row">
+		  <div class="fr-footer__col">
+			<div class="fr-footer__title">Évolution de la France par présidence</div>
+			<div class="fr-footer__desc">Analyse des données publiques de 1959 à 2025</div>
+		  </div>
+		  <div class="fr-footer__col">
+			<div class="fr-footer__title"><a href="sources.html" style="color:inherit;text-decoration:underline;">Sources</a></div>
+			<div class="fr-footer__desc">Données compilées à partir de sources statistiques officielles françaises et internationales</div>
+		  </div>
+		</div>
+		<hr class="fr-footer__divider">
+		<div class="fr-footer__copyright">
+		  © 2025 - Visualisation des données publiques de la France - <a href="http://www.mon-compteur.fr"><img src="http://www.mon-compteur.fr/html_c01genv2-245014-3" border="0" /></a>
+
+		</div>
+	  </div>
+	</footer>
+</body>
+</html>
