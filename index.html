@@ -19,7 +19,7 @@
 	<meta name="robots" content="index, follow">
 
 	<!-- Canonical (évite le contenu dupliqué, à adapter si besoin) -->
-	<link rel="canonical" href="https://franceevolution.netlify.app/">
+  <link rel="canonical" href="https://maurice-churlet.github.io/France-Evolution-Site/">
 
 	<!-- Viewport (expérience mobile) -->
 	<meta name="viewport" content="width=device-width, initial-scale=1">
@@ -30,15 +30,26 @@
 	<!-- Open Graph pour Facebook et réseaux sociaux -->
 	<meta property="og:title" content="Évolution de la France par Présidence | Données et Classements 2025">
 	<meta property="og:description" content="Comparez l’évolution de la France sous chaque président : dépenses publiques, classements mondiaux, santé, éducation, économie.">
-	<meta property="og:url" content="https://franceevolution.netlify.app/">
+  <meta property="og:url" content="https://maurice-churlet.github.io/France-Evolution-Site/">
 	<meta property="og:type" content="website">
-	<meta property="og:image" content="https://franceevolution.netlify.app/dette.jpg"> <!-- À adapter à ton image de partage -->
+  <meta property="og:site_name" content="France Evolution Site">
+  <meta property="og:image" content="https://maurice-churlet.github.io/France-Evolution-Site/dette.jpg">
 
 	<!-- Twitter Card -->
 	<meta name="twitter:card" content="summary_large_image">
 	<meta name="twitter:title" content="Évolution de la France par Présidence | Données et Classements 2025">
 	<meta name="twitter:description" content="Découvrez les tendances de la France sous chaque président : dépenses publiques, classements mondiaux, et plus.">
-	<meta name="twitter:image" content="https://franceevolution.netlify.app/dette.jpg"> <!-- À adapter -->
+  <meta name="twitter:image" content="https://maurice-churlet.github.io/France-Evolution-Site/dette.jpg">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "La France de 1959 à 2025",
+    "url": "https://maurice-churlet.github.io/France-Evolution-Site/",
+    "description": "Analyse de l'évolution des dépenses publiques, de la dette publique et des classements internationaux de la France sous la Ve République.",
+    "inLanguage": "fr-FR"
+  }
+  </script>
   
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link href="https://fonts.googleapis.com/css?family=Marianne,Roboto:400,700&display=swap" rel="stylesheet">
@@ -246,8 +257,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
   </div>
   <div class="fr-container">
-            <li><a href="dette_presidents.html">Dette publique</a></li>
-          <li><a href="sources.html">Sources</a></li>
+    <nav aria-label="Navigation principale" style="margin-bottom:24px;">
+      <ul style="display:flex;gap:18px;flex-wrap:wrap;list-style:none;padding:0;margin:0;">
+        <li><a href="index.html">Accueil</a></li>
+        <li><a href="dette_presidents.html">Dette publique</a></li>
+        <li><a href="sources.html">Sources</a></li>
+      </ul>
+    </nav>
     <p>
       Cette plateforme présente l'évolution de la France sous différentes présidences, de Charles de Gaulle à Emmanuel Macron, à travers plusieurs indicateurs clés : les dépenses publiques (en pourcentage du PIB) et le classement mondial dans des domaines stratégiques comme l'éducation, la santé, l'économie, la défense et la recherche.
     </p>
@@ -284,7 +300,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         Ces tendances suggèrent un modèle français qui a progressivement réorienté ses priorités des fonctions régaliennes (défense) vers les dépenses sociales (santé), tout en maintenant un effort relativement constant en éducation et recherche, mais insuffisant pour préserver son rang mondial face à la montée de nouvelles puissances.
       </p>
     </div>
-	<P></p><li><a href="dette_presidents.html">Dette publique</a></li>
+	<p><a href="dette_presidents.html">Voir la page détaillée sur la dette publique française par présidence</a></p>
   </div>
 <script>
 // Données pour les graphiques
