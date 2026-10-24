@@ -88,6 +88,12 @@ def serie_dette(donnees: dict) -> tuple[list[float], list[float]]:
     return [int(a) + 1 for a in valeurs], list(valeurs.values())
 
 
+def reelle(xs, ys, t):
+    """Dernier point réellement publié à l'abscisse t (jamais une valeur interpolée)."""
+    n = max(1, sum(1 for x in xs if x <= t))
+    return xs[n - 1], ys[n - 1]
+
+
 def jusqua(xs, ys, t):
     """Points de la courbe jusqu'à l'abscisse t, avec un point interpolé au bout."""
     px = [x for x in xs if x <= t]
@@ -134,8 +140,9 @@ def clip_courbe(donnees: dict, xs: list, ys: list, ymax: float, titre_axe: str,
         px, py = jusqua(xs, ys, t)
         ligne.set_data(px, py)
         point.set_data([px[-1]], [py[-1]])
-        compteur.set_text(f"{fr(py[-1])} %")
-        sous_titre.set_text(legende(t))
+        x_reel, y_reel = reelle(xs, ys, t)
+        compteur.set_text(f"{fr(y_reel)} %")
+        sous_titre.set_text(legende(x_reel))
 
     enregistrer(fig, maj, trace + pause, nom)
 
@@ -246,7 +253,7 @@ def clip_rang(donnees: dict, cle: str) -> None:
             compteur.set_text(ordinal(int(r)))
             sous_titre.set_text(f"{clip['rang']} · {int(x)}")
         if py:
-            valeur.set_text(clip["valeur"].format(v=fr(py[-1], decimales)))
+            valeur.set_text(clip["valeur"].format(v=fr(reelle(vx, vy, t)[1], decimales)))
 
     enregistrer(fig, maj, trace + pause, clip["fichier"])
 
@@ -283,11 +290,12 @@ def clip_dette_macron(donnees: dict) -> None:
         ligne.set_data(px, py)
         point.set_data([px[-1]], [py[-1]])
         covid.set_visible(t >= 2021)
-        compteur.set_text(f"{fr(py[-1])} %")
-        if t >= xs[-1]:
+        x_reel, y_reel = reelle(xs, ys, t)
+        compteur.set_text(f"{fr(y_reel)} %")
+        if x_reel >= xs[-1]:
             legende.set_text(f"de dette publique · mi-{annee_t}")
         else:
-            legende.set_text(f"de dette publique · fin {int(t) - 1}")
+            legende.set_text(f"de dette publique · fin {int(x_reel) - 1}")
 
     enregistrer(fig, maj, trace + pause, "dette_macron.mp4")
 
@@ -342,6 +350,53 @@ def clip_rythme(donnees: dict) -> None:
     enregistrer(fig, maj, pousse + pause, "rythme_presidents.mp4")
 
 
+def clip_pisa(donnees: dict) -> None:
+    """Scores PISA de la France (maths en rouge, lecture en bleu clair) depuis 2000."""
+    pisa = donnees["series"]["education"]["pisa"]
+    mx = [int(a) + 0.5 for a in pisa["maths"]]
+    my = list(pisa["maths"].values())
+    lx = [int(a) + 0.5 for a in pisa["lecture"]]
+    ly = list(pisa["lecture"].values())
+
+    fig, ax = figure()
+    ax.set_xlim(2000, mx[-1] + 1)
+    ax.set_ylim(440, 530)
+    ax.set_ylabel("Score PISA (axe zoomé)", fontsize=24)
+    for i, p in enumerate(donnees["presidences"]):
+        gauche, droite = max(p["debut"], 2000), min(p["fin"], mx[-1] + 1)
+        if droite - gauche < 2:
+            continue
+        ax.axvspan(gauche, droite, color=BLANC, alpha=0.07 if i % 2 else 0.0, lw=0)
+        ax.text((gauche + droite) / 2, 1.01, p["court"], transform=ax.get_xaxis_transform(),
+                ha="center", va="bottom", fontsize=17, color=GRIS)
+    ligne_m, = ax.plot([], [], color=ROUGE, lw=6, marker="o", ms=10, solid_capstyle="round")
+    ligne_l, = ax.plot([], [], color="#7fa6ff", lw=4, marker="o", ms=8)
+    point, = ax.plot([], [], "o", color=BLANC, ms=16)
+    ax.text(0.98, 0.95, "maths", transform=ax.transAxes, ha="right", fontsize=24, color=ROUGE)
+    ax.text(0.98, 0.89, "lecture", transform=ax.transAxes, ha="right", fontsize=24, color="#7fa6ff")
+    compteur = fig.text(0.5, 0.765, "", ha="center", fontsize=150, fontweight="bold")
+    sous_titre = fig.text(0.5, 0.735, "", ha="center", fontsize=32, color=GRIS)
+    lecture = fig.text(0.5, 0.705, "", ha="center", fontsize=32, color="#7fa6ff")
+    fig.text(0.5, 0.255, "Sources : OCDE (PISA), DEPP", ha="center", fontsize=22, color=GRIS)
+
+    trace, pause = 8 * IPS, 2 * IPS
+
+    def maj(i):
+        t = mx[0] + (mx[-1] - mx[0]) * adouci(i / trace)
+        px, py = jusqua(mx, my, t)
+        qx, qy = jusqua(lx, ly, t)
+        ligne_m.set_data(px, py)
+        ligne_l.set_data(qx, qy)
+        point.set_data([px[-1]], [py[-1]])
+        # Valeurs des seules années d'enquête (tous les 3 ans), jamais interpolées.
+        x_m, y_m = reelle(mx, my, t)
+        compteur.set_text(f"{y_m:.0f}")
+        sous_titre.set_text(f"points en maths à 15 ans · {int(x_m)}")
+        lecture.set_text(f"compréhension de l'écrit : {reelle(lx, ly, t)[1]:.0f} points")
+
+    enregistrer(fig, maj, trace + pause, "pisa.mp4")
+
+
 def main() -> None:
     donnees = json.loads((RACINE / "data" / "donnees.json").read_text(encoding="utf-8"))
     clip_dette_longue(donnees)
@@ -350,6 +405,7 @@ def main() -> None:
     clip_patrimoine(donnees)
     for cle in CLIPS_RANG:
         clip_rang(donnees, cle)
+    clip_pisa(donnees)
 
 
 if __name__ == "__main__":

@@ -3,10 +3,11 @@
 # dependencies = ["edge-tts", "pillow", "imageio-ffmpeg"]
 # ///
 """Monte la vidéo TikTok complète : clips de video/, voix de synthèse, sous-titres incrustés
-et carton final. Produit video/tiktok_merci_macron.mp4 (1080x1920, sans musique : elle
+et carton final. Produit video/tiktok_merci_macron*.mp4 (1080x1920, sans musique : elle
 s'ajoute dans l'application TikTok, dont la bibliothèque est sous licence).
 
-Usage : uv run scripts/montage_tiktok.py   (régénérer d'abord les clips avec clips_tiktok.py)
+Usage : uv run scripts/montage_tiktok.py [partie1] [partie2]   (toutes par défaut ;
+régénérer d'abord les clips avec clips_tiktok.py)
 La voix est produite par le service de lecture à voix haute de Microsoft (edge-tts) :
 le texte du script lui est envoyé.
 """
@@ -16,6 +17,7 @@ from __future__ import annotations
 import asyncio
 import re
 import subprocess
+import sys
 import tempfile
 from pathlib import Path
 
@@ -25,15 +27,15 @@ from PIL import Image, ImageDraw, ImageFont
 
 RACINE = Path(__file__).resolve().parent.parent
 VIDEO = RACINE / "video"
-SORTIE = VIDEO / "tiktok_merci_macron.mp4"
 FFMPEG = imageio_ffmpeg.get_ffmpeg_exe()
 VOIX = "fr-FR-HenriNeural"
 DEBIT = "+6%"
 LARGEUR, HAUTEUR, IPS = 1080, 1920, 30
 POLICE = "C:/Windows/Fonts/segoeuib.ttf"
 
-# (clip, texte lu). Chiffres repris de data/donnees.json au 24/10/2026.
-SEQUENCES = [
+# Chaque vidéo : fichier produit, séquences (clip, texte lu), question finale (lue, puis
+# affichée ligne à ligne). Chiffres repris de data/donnees.json au 24/10/2026.
+SEQUENCES_PARTIE1 = [
     ("dette_1958.mp4", "Merci Macron ! En 1958, la dette, c'est 32 % du PIB. Elle fond sous de "
                        "Gaulle… puis elle ne fait plus que monter. Fin 2025 : 115,7 %."),
     ("dette_macron.mp4", "Macron hérite de 98 %. Le Covid passe par là… on pardonne. Mais le Covid "
@@ -48,12 +50,41 @@ SEQUENCES = [
     ("patrimoine_1pct.mp4", "Bonne nouvelle quand même : les 1 % les plus riches vont très bien. "
                             "16 % du patrimoine en 1984… près de 28 % aujourd'hui."),
 ]
-# Carton final : la question (lue et affichée), puis les sources et l'adresse du site.
-QUESTION_LUE = ("Et si nos politiques répondaient de leurs résultats… sur leurs biens propres ? "
-                "Vous pensez que ça irait mieux ? Dites-le en commentaire.")
-QUESTION = ["Et si nos politiques", "répondaient de leurs", "résultats… sur leurs",
-            "biens propres ?", "", "Ça irait mieux ?", "Dites-le en commentaire !"]
-SOURCES = ["Tous les chiffres et les sources :", "Insee · Eurostat · ONU · FMI",
+SEQUENCES_PARTIE2 = [
+    ("rang_defense.mp4", "Merci Macron, partie 2. La défense : en 2005, la France avait le 3e "
+                         "budget militaire du monde. 8e quand Macron arrive. 9e aujourd'hui, malgré "
+                         "un budget en hausse. Les autres réarment plus vite."),
+    ("rang_sante.mp4", "La santé : 11 % du PIB, une des dépenses les plus élevées du monde. Et "
+                       "l'espérance de vie ? 6e mondiale en 2011… 15e aujourd'hui. On vit plus "
+                       "longtemps, mais les autres encore plus."),
+    ("pisa.mp4", "L'école : en 2000, nos élèves de 15 ans avaient 517 points en maths. 495 en "
+                 "2018. 458 en 2025. Toute l'OCDE baisse… mais nous, un peu plus vite."),
+    ("rang_recherche.mp4", "La recherche : l'objectif européen, c'est 3 % du PIB. La France ? "
+                           "2,2 %… depuis trente ans. Résultat : 11e en 2010, 17e aujourd'hui."),
+]
+
+VIDEOS = {
+    "partie1": {
+        "fichier": "tiktok_merci_macron.mp4",
+        "sequences": SEQUENCES_PARTIE1,
+        "question_lue": "Et si nos politiques répondaient de leurs résultats… sur leurs biens "
+                        "propres ? Vous pensez que ça irait mieux ? Dites-le en commentaire.",
+        "question": ["Et si nos politiques", "répondaient de leurs", "résultats… sur leurs",
+                     "biens propres ?", "", "Ça irait mieux ?", "Dites-le en commentaire !"],
+    },
+    "partie2": {
+        "fichier": "tiktok_merci_macron_2.mp4",
+        "sequences": SEQUENCES_PARTIE2,
+        "question_lue": "Et si nos dirigeants devaient se soigner à l'hôpital public et mettre "
+                        "leurs enfants à l'école publique… ça irait mieux ? Dites-le en commentaire.",
+        "question": ["Et si nos dirigeants", "se soignaient à", "l'hôpital public…", "",
+                     "et mettaient leurs", "enfants à l'école", "publique ?", "",
+                     "Dites-le en commentaire !"],
+    },
+}
+
+# Bas du carton final : sources et adresse du site.
+SOURCES = ["Tous les chiffres et les sources :", "Insee · Eurostat · OCDE · ONU · SIPRI",
            "maurice-churlet.github.io/France-Evolution-Site"]
 
 
@@ -110,8 +141,8 @@ async def voix(texte: str, chemin: Path) -> None:
 
 
 def sequence(i: int, clip: str, texte: str, tmp: Path) -> Path:
-    """Un segment : clip (prolongé sur sa dernière image si la voix est plus longue),
-    voix, et sous-titres en haut de l'écran, au-dessus du compteur."""
+    """Un segment : clip (ralenti si la voix est plus longue), voix, et sous-titres en haut
+    de l'écran, au-dessus du compteur."""
     audio = tmp / f"voix{i}.mp3"
     asyncio.run(voix(texte, audio))
     d_voix, d_clip = duree(audio), duree(VIDEO / clip)
@@ -128,7 +159,9 @@ def sequence(i: int, clip: str, texte: str, tmp: Path) -> Path:
         sortie = f"[v{j}]"
         filtres.append(f"{courant}[{j + 2}:v]overlay=0:0:enable='between(t,{debut:.2f},{fin:.2f})'{sortie}")
         courant, debut = sortie, fin
-    prolonge = f"[0:v]tpad=stop_mode=clone:stop_duration={max(0, total - d_clip):.2f}[base]"
+    # Clip ralenti à la durée de la voix : la courbe avance au rythme du commentaire, qui
+    # suit lui aussi l'ordre chronologique.
+    prolonge = f"[0:v]setpts={total / d_clip:.4f}*PTS[base]"
     filtres[0] = filtres[0].replace("[0:v]", "[base]", 1)
     graphe = ";".join([prolonge, *filtres])
 
@@ -141,13 +174,13 @@ def sequence(i: int, clip: str, texte: str, tmp: Path) -> Path:
     return resultat
 
 
-def carton(tmp: Path) -> Path:
+def carton(tmp: Path, question_lue: str, question: list[str]) -> Path:
     """Carton final : question lue par la voix, sources et adresse en bas."""
     audio = tmp / "voix_question.mp3"
-    asyncio.run(voix(QUESTION_LUE, audio))
+    asyncio.run(voix(question_lue, audio))
     total = duree(audio) + 1.5
     png = tmp / "carton.png"
-    image_texte(QUESTION, png, 72, fond=True, y_centre=760, pied=SOURCES)
+    image_texte(question, png, 72, fond=True, y_centre=760, pied=SOURCES)
     resultat = tmp / "carton.mp4"
     ffmpeg("-loop", "1", "-i", str(png), "-i", str(audio), "-af", f"apad=whole_dur={total:.2f}",
            "-t", f"{total:.2f}", "-r", str(IPS), "-c:v", "libx264", "-pix_fmt", "yuv420p",
@@ -155,19 +188,29 @@ def carton(tmp: Path) -> Path:
     return resultat
 
 
-def main() -> None:
-    manquants = [c for c, _ in SEQUENCES if not (VIDEO / c).exists()]
+def monter(nom: str) -> None:
+    video = VIDEOS[nom]
+    sortie = VIDEO / video["fichier"]
+    manquants = [c for c, _ in video["sequences"] if not (VIDEO / c).exists()]
     if manquants:
         raise SystemExit(f"Clips manquants dans video/ : {manquants} (lancer clips_tiktok.py)")
     with tempfile.TemporaryDirectory() as dossier:
         tmp = Path(dossier)
-        morceaux_video = [sequence(i, c, t, tmp) for i, (c, t) in enumerate(SEQUENCES)]
-        morceaux_video.append(carton(tmp))
+        morceaux_video = [sequence(i, c, t, tmp) for i, (c, t) in enumerate(video["sequences"])]
+        morceaux_video.append(carton(tmp, video["question_lue"], video["question"]))
         liste = tmp / "liste.txt"
         liste.write_text("".join(f"file '{m.as_posix()}'\n" for m in morceaux_video), encoding="utf-8")
         ffmpeg("-f", "concat", "-safe", "0", "-i", str(liste), "-c", "copy",
-               "-movflags", "+faststart", str(SORTIE))
-    print(f"Écrit : video/{SORTIE.name} ({duree(SORTIE):.1f} s)")
+               "-movflags", "+faststart", str(sortie))
+    print(f"Écrit : video/{sortie.name} ({duree(sortie):.1f} s)")
+
+
+def main() -> None:
+    noms = sys.argv[1:] or list(VIDEOS)
+    for nom in noms:
+        if nom not in VIDEOS:
+            raise SystemExit(f"Vidéo inconnue : {nom} (choix : {', '.join(VIDEOS)})")
+        monter(nom)
 
 
 if __name__ == "__main__":
