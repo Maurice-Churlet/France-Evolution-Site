@@ -19,6 +19,7 @@ from pathlib import Path
 
 import imageio_ffmpeg
 import matplotlib
+import matplotlib.ticker
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
@@ -66,6 +67,7 @@ def figure(gauche: float = 0.11):
         ax.spines[cote].set_color(GRIS)
     ax.tick_params(labelsize=22)
     ax.grid(axis="y", color="#2a4585", lw=1)
+    ax.xaxis.set_major_locator(matplotlib.ticker.MaxNLocator(integer=True, nbins=6))  # années entières
     return fig, ax
 
 
@@ -96,23 +98,26 @@ def jusqua(xs, ys, t):
 
 
 def clip_courbe(donnees: dict, xs: list, ys: list, ymax: float, titre_axe: str,
-                legende, sources: str, nom: str, taille_legende: int = 40) -> None:
-    """Courbe longue qui se trace depuis 1959 sur fond des présidences, avec compteur.
+                legende, sources: str, nom: str, taille_legende: int = 40,
+                debut: int = 1959) -> None:
+    """Courbe qui se trace à partir de `debut` sur fond des présidences, avec compteur.
 
     `legende(t)` donne le texte sous le compteur quand la courbe atteint l'abscisse t.
     """
-    xs, ys = zip(*[(x, y) for x, y in zip(xs, ys) if x >= 1959])
+    xs, ys = zip(*[(x, y) for x, y in zip(xs, ys) if x >= debut])
     xs, ys = list(xs), list(ys)
     fig, ax = figure()
-    ax.set_xlim(1959, xs[-1] + 0.5)
+    ax.set_xlim(debut, xs[-1] + 0.5)
     ax.set_ylim(0, ymax)
     ax.set_ylabel(titre_axe, fontsize=24)
     for i, p in enumerate(donnees["presidences"]):
         fin = min(p["fin"], xs[-1])
+        if fin <= debut:
+            continue
         ax.axvspan(p["debut"], fin, color=BLANC, alpha=0.07 if i % 2 else 0.0, lw=0)
         # Nom en haut de la bande, sauf quand la courbe y monte : il passe alors en bas.
         haut = max(y for x, y in zip(xs, ys) if p["debut"] <= x <= fin) > 0.73 * ymax
-        ax.text((p["debut"] + fin) / 2, 0.03 * ymax if haut else 0.98 * ymax, p["court"],
+        ax.text((max(p["debut"], debut) + fin) / 2, 0.03 * ymax if haut else 0.98 * ymax, p["court"],
                 rotation=90, ha="center", va="bottom" if haut else "top", fontsize=20, color=GRIS)
     ligne, = ax.plot([], [], color=ROUGE, lw=6, solid_capstyle="round")
     point, = ax.plot([], [], "o", color=BLANC, ms=16)
@@ -146,7 +151,87 @@ def clip_patrimoine(donnees: dict) -> None:
     clip_courbe(donnees, xs, list(valeurs.values()), 40, "Part du patrimoine total (%)",
                 lambda t: f"du patrimoine aux 1 % les plus riches · {int(t - 0.5)}",
                 "Source : World Inequality Database (WID.world)", "patrimoine_1pct.mp4",
-                taille_legende=30)
+                taille_legende=30, debut=1981)
+
+
+# Clips « classement mondial » : un par graphique du site qui a un rang, limité aux années
+# classées. Clé de série -> (texte de la valeur, texte du rang, source, nom du fichier).
+CLIPS_RANG = {
+    "sante": ("du PIB en dépenses de santé", "rang mondial · espérance de vie",
+              "Sources : OCDE, Banque mondiale", "rang_sante.mp4"),
+    "defense": ("du PIB pour la défense", "rang mondial · budget militaire",
+                "Source : SIPRI", "rang_defense.mp4"),
+    "recherche": ("du PIB pour la recherche", "rang · effort de recherche (pays OCDE)",
+                  "Source : OCDE", "rang_recherche.mp4"),
+    "economie": ("de croissance du PIB", "rang mondial · taille du PIB",
+                 "Source : Banque mondiale", "rang_economie.mp4"),
+}
+
+
+def ordinal(n: int) -> str:
+    return "1er" if n == 1 else f"{n}e"
+
+
+def clip_rang(donnees: dict, cle: str) -> None:
+    """La valeur (bleu, axe gauche) et le rang mondial (rouge, axe droit inversé) se tracent
+    ensemble, sur la seule période où le rang existe. Le compteur affiche le rang."""
+    texte_valeur, texte_rang, sources, nom = CLIPS_RANG[cle]
+    s = donnees["series"][cle]
+    annees_rang = sorted(int(a) for a in s["rang"])
+    a0, a1 = annees_rang[0], annees_rang[-1]
+    # Années non classées : NaN, pour laisser un trou plutôt que relier deux points éloignés.
+    rx = [a + 0.5 for a in range(a0, a1 + 1)]
+    ry = [s["rang"][str(a)][0] if str(a) in s["rang"] else float("nan") for a in range(a0, a1 + 1)]
+    vx = [int(a) + 0.5 for a in s["valeurs"] if a0 <= int(a) <= a1]
+    vy = [v for a, v in s["valeurs"].items() if a0 <= int(a) <= a1]
+    decimales = 2 if cle in ("defense", "recherche") else 1
+
+    fig, ax = figure()
+    ax.set_xlim(a0, a1 + 1)
+    marge = (max(vy) - min(vy)) * 0.15 or 0.5
+    ax.set_ylim(min(vy) - marge, max(vy) + marge)
+    ax.set_ylabel(f"{s['titre']} ({s['unite']})", fontsize=22, color=GRIS)
+    ax2 = ax.twinx()
+    ax2.set_ylim(max(r for r in ry if r == r) + 0.5, max(0.5, min(r for r in ry if r == r) - 0.5))
+    ax2.yaxis.set_major_locator(matplotlib.ticker.MaxNLocator(integer=True))
+    ax2.yaxis.set_major_formatter(matplotlib.ticker.FuncFormatter(lambda v, _: ordinal(int(v))))
+    ax2.tick_params(labelsize=22, colors=ROUGE)
+    for cote in ("top", "left", "bottom"):
+        ax2.spines[cote].set_visible(False)
+    ax2.spines["right"].set_color(ROUGE)
+    for i, p in enumerate(donnees["presidences"]):
+        gauche, droite = max(p["debut"], a0), min(p["fin"], a1 + 1)
+        if droite - gauche < 2:
+            continue  # bande trop étroite pour un nom lisible
+        ax.axvspan(gauche, droite, color=BLANC, alpha=0.07 if i % 2 else 0.0, lw=0)
+        ax.text((gauche + droite) / 2, 1.01, p["court"], transform=ax.get_xaxis_transform(),
+                ha="center", va="bottom", fontsize=17, color=GRIS)
+    ligne_v, = ax.plot([], [], color="#7fa6ff", lw=4)
+    ligne_r, = ax2.plot([], [], color=ROUGE, lw=6, solid_capstyle="round")
+    point, = ax2.plot([], [], "o", color=BLANC, ms=16)
+    compteur = fig.text(0.5, 0.765, "", ha="center", fontsize=150, fontweight="bold")
+    sous_titre = fig.text(0.5, 0.735, "", ha="center", fontsize=32, color=GRIS)
+    valeur = fig.text(0.5, 0.705, "", ha="center", fontsize=32, color="#7fa6ff")
+    fig.text(0.5, 0.255, sources, ha="center", fontsize=22, color=GRIS)
+
+    trace, pause = 8 * IPS, 2 * IPS
+
+    def maj(i):
+        t = rx[0] + (rx[-1] - rx[0]) * adouci(i / trace)
+        px, py = jusqua(vx, vy, t)
+        ligne_v.set_data(px, py)
+        n = sum(1 for x in rx if x <= t)
+        ligne_r.set_data(rx[:n], ry[:n])
+        connus = [(x, r) for x, r in zip(rx[:n], ry[:n]) if r == r]
+        if connus:
+            x, r = connus[-1]
+            point.set_data([x], [r])
+            compteur.set_text(ordinal(int(r)))
+            sous_titre.set_text(f"{texte_rang} · {int(x)}")
+        if py:
+            valeur.set_text(f"{fr(py[-1], decimales)} % {texte_valeur}")
+
+    enregistrer(fig, maj, trace + pause, nom)
 
 
 def clip_dette_macron(donnees: dict) -> None:
@@ -246,6 +331,8 @@ def main() -> None:
     clip_dette_macron(donnees)
     clip_rythme(donnees)
     clip_patrimoine(donnees)
+    for cle in CLIPS_RANG:
+        clip_rang(donnees, cle)
 
 
 if __name__ == "__main__":

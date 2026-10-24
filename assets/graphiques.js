@@ -160,19 +160,31 @@ const FES = (() => {
     };
   }
 
+  // Première année classée d'une série (ou null si elle n'a pas de rang).
+  function debutClassement(s) {
+    return s.rang ? annees(s.rang)[0] : null;
+  }
+
   // Graphique d'un domaine : la série en % (axe gauche) et, s'il existe, le rang
-  // mondial ou le score PISA (axe droit).
-  function graphique(canvas, donnees, cle) {
+  // mondial ou le score PISA (axe droit). Avec `periodeClassee`, le graphique se limite
+  // aux années où le rang mondial existe et l'axe gauche se resserre sur les valeurs.
+  function graphique(canvas, donnees, cle, { periodeClassee = false } = {}) {
     const s = donnees.series[cle];
     const decalage = DECALAGE[cle] ?? 0.5;
-    const jeux = [ligne(`${s.titre} (${s.unite})`, points(s.valeurs, decalage), BLEU, "y")];
+    const debut = periodeClassee ? debutClassement(s) : null;
+    const valeurs = debut
+      ? Object.fromEntries(Object.entries(s.valeurs).filter(([a]) => Number(a) >= debut))
+      : s.valeurs;
+    const jeux = [ligne(`${s.titre} (${s.unite})`, points(valeurs, decalage), BLEU, "y")];
+    const x = axeX(donnees, [cle]);
+    if (debut) x.min = debut;
     const echelles = {
-      x: axeX(donnees, [cle]),
+      x,
       y: {
         position: "left",
-        beginAtZero: cle !== "economie",
+        beginAtZero: !debut && cle !== "economie",
         title: { display: true, text: s.unite, color: BLEU },
-        ticks: { color: BLEU, callback: v => nombre(v, 0) },
+        ticks: { color: BLEU, callback: v => nombre(v, Number.isInteger(v) ? 0 : 1) },
         // Ligne du zéro appuyée : on voit tout de suite quand la croissance est négative.
         grid: { color: c => (c.tick.value === 0 ? "#8a93a6" : "#eef2f8"), lineWidth: c => (c.tick.value === 0 ? 1.5 : 1) },
       },
@@ -181,7 +193,8 @@ const FES = (() => {
     // L'axe de droite est resserré sur les valeurs observées pour que la courbe occupe
     // toute la hauteur ; les graduations et l'infobulle donnent l'échelle réelle.
     if (s.rang) {
-      jeux.push(ligne(s.rang_libelle, pointsRang(s.rang, 0.5), ROUGE, "y1"));
+      // Petits points : un rang isolé entre deux années non classées reste visible.
+      jeux.push(ligne(s.rang_libelle, pointsRang(s.rang, 0.5), ROUGE, "y1", { pointRadius: 2 }));
       const valeurs = Object.values(s.rang).map(r => r[0]);
       echelles.y1 = {
         position: "right",
@@ -267,5 +280,5 @@ const FES = (() => {
     return ` Valeur${s.provisoires.length > 1 ? "s" : ""} provisoire${s.provisoires.length > 1 ? "s" : ""} : ${s.provisoires.join(", ")}.`;
   }
 
-  return { charger, nombre, ecart, ordinal, provisoires, bilan, moyenne, valeurProche, annees, graphique, sourcesHtml, afficherMiseAJour, signalerErreur };
+  return { charger, nombre, ecart, ordinal, provisoires, debutClassement, bilan, moyenne, valeurProche, annees, graphique, sourcesHtml, afficherMiseAJour, signalerErreur };
 })();

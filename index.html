@@ -74,6 +74,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <button type="button" data-domaine="recherche" aria-pressed="false">Recherche</button>
       <button type="button" data-domaine="economie" aria-pressed="false">Économie</button>
     </div>
+    <div class="selecteur" id="periode" role="group" aria-label="Période affichée" hidden>
+      <button type="button" data-periode="classee" aria-pressed="true">Période du classement mondial</button>
+      <button type="button" data-periode="tout" aria-pressed="false">Depuis 1959</button>
+    </div>
     <div class="graphique"><canvas id="graphique" aria-label="Graphique de l'indicateur choisi" role="img"></canvas></div>
     <div id="explication" class="encadre"></div>
 
@@ -151,7 +155,7 @@ const EXPLICATIONS = {
   economie: "La croissance du PIB en volume dépasse 5 % par an pendant les Trente Glorieuses, ralentit après les chocs pétroliers de 1973 et 1979, puis tourne autour de 1 % à 2 % depuis les années 2000, avec deux récessions (2009 et 2020). Le rang compare la taille des économies en dollars courants ; il dépend aussi des taux de change."
 };
 
-let donnees, graphiqueCourant;
+let donnees, graphiqueCourant, domaineCourant = "dette", periodeClassee = true;
 
 function chiffresCles(s) {
   const liste = FES.annees(s.valeurs);
@@ -168,10 +172,17 @@ function chiffresCles(s) {
 }
 
 function afficherDomaine(cle) {
+  domaineCourant = cle;
   const s = donnees.series[cle];
-  document.querySelectorAll(".selecteur button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.domaine === cle)));
+  document.querySelectorAll("[data-domaine]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.domaine === cle)));
+  // Le choix de période n'a de sens que pour les indicateurs qui ont un classement mondial.
+  const debut = FES.debutClassement(s);
+  const periode = document.getElementById("periode");
+  periode.hidden = !debut;
+  if (debut) periode.querySelector('[data-periode="classee"]').textContent = `Période du classement (depuis ${debut})`;
+  periode.querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", String((b.dataset.periode === "classee") === periodeClassee)));
   if (graphiqueCourant) graphiqueCourant.destroy();
-  graphiqueCourant = FES.graphique(document.getElementById("graphique"), donnees, cle);
+  graphiqueCourant = FES.graphique(document.getElementById("graphique"), donnees, cle, { periodeClassee });
   document.getElementById("explication").innerHTML =
     `<p>${EXPLICATIONS[cle]}</p><p>${chiffresCles(s)}</p>`
     + `<p class="discret">${s.note}${s.ruptures ? ` Ruptures de série : ${s.ruptures.join(", ")} (traits pointillés).` : ""}`
@@ -231,7 +242,11 @@ function remplirValeurs() {
 FES.charger().then(d => {
   donnees = d;
   FES.afficherMiseAJour(d);
-  document.querySelectorAll(".selecteur button").forEach(b => b.addEventListener("click", () => afficherDomaine(b.dataset.domaine)));
+  document.querySelectorAll("[data-domaine]").forEach(b => b.addEventListener("click", () => afficherDomaine(b.dataset.domaine)));
+  document.querySelectorAll("[data-periode]").forEach(b => b.addEventListener("click", () => {
+    periodeClassee = b.dataset.periode === "classee";
+    afficherDomaine(domaineCourant);
+  }));
   afficherDomaine("dette");
   tableauBilans();
   remplirValeurs();
