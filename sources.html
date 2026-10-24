@@ -1,130 +1,179 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<!-- Google Tag Manager -->
-<script>
-(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-PNFM7H8Q');
-</script>
-
   <meta charset="UTF-8">
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-PNFM7H8Q');</script>
+  <!-- End Google Tag Manager -->
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Sources des données publiques de la France</title>
-  <meta name="description" content="Consultez les sources officielles utilisées pour analyser les dépenses publiques, la dette et les classements internationaux de la France.">
+  <title>Sources et méthode | La France de 1959 à aujourd'hui</title>
+  <meta name="description" content="Sources officielles (Insee, Eurostat, OCDE, FMI, Banque mondiale, SIPRI) et méthode de calcul utilisées pour suivre la dette, la santé, l'éducation, la défense, la recherche et la croissance de la France.">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://maurice-churlet.github.io/France-Evolution-Site/sources.html">
-  <meta property="og:title" content="Sources des données publiques de la France">
-  <meta property="og:description" content="Liste des sources officielles mobilisées pour documenter l'évolution de la France sous la Ve République.">
+  <meta property="og:title" content="Sources et méthode | La France de 1959 à aujourd'hui">
+  <meta property="og:description" content="Les sources officielles et la méthode du site, indicateur par indicateur.">
   <meta property="og:type" content="article">
   <meta property="og:url" content="https://maurice-churlet.github.io/France-Evolution-Site/sources.html">
-  <meta property="og:image" content="https://maurice-churlet.github.io/France-Evolution-Site/dette.jpg">
+  <meta property="og:image" content="https://maurice-churlet.github.io/France-Evolution-Site/dette.png">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Sources des données publiques de la France">
-  <meta name="twitter:description" content="Retrouvez les sources officielles utilisées sur le site France Evolution Site.">
-  <meta name="twitter:image" content="https://maurice-churlet.github.io/France-Evolution-Site/dette.jpg">
-
-<style>
-  body {
-    font-family: 'Marianne', 'Roboto', Arial, sans-serif;
-    background: #f5f7fa;
-    margin: 0; padding: 0;
-    color: #14387f;
-  }
-    .container {
-      max-width: 900px;
-      margin: 40px auto;
-      background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 4px 18px #14387f18;
-      padding: 36px 28px;
-    }
-    h1 {
-      color: #14387f;
-      font-size: 2em;
-      margin-bottom: 22px;
-    }
-    h2 {
-      color: #14387f;
-      font-size: 1.2em;
-      margin-top: 2em;
-    }
-    ul {
-      margin-top: 0;
-      margin-bottom: 1.5em;
-    }
-    a {
-      color: #1b2b4f;
-      text-decoration: underline;
-    }
-    .back {
-      display: inline-block;
-      margin-bottom: 18px;
-      color: #14387f;
-      font-size: 1em;
-      text-decoration: none;
-      border: 1px solid #14387f;
-      padding: 6px 16px;
-      border-radius: 5px;
-      background: #eaf0fa;
-      transition: background .2s;
-    }
-    .back:hover {
-      background: #dbe2ef;
-    }
-  </style>
+  <meta name="twitter:title" content="Sources et méthode | La France de 1959 à aujourd'hui">
+  <meta name="twitter:description" content="Les sources officielles et la méthode du site, indicateur par indicateur.">
+  <meta name="twitter:image" content="https://maurice-churlet.github.io/France-Evolution-Site/dette.png">
+  <link rel="stylesheet" href="assets/site.css">
+  <script src="assets/graphiques.js"></script>
 </head>
 <body>
 <!-- Google Tag Manager (noscript) -->
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PNFM7H8Q"
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- End Google Tag Manager (noscript) -->
-  <div class="container">
-    <a class="back" href="index.html">&larr; Retour à la page principale</a>
-    <h1>Sources des données publiques de la France</h1>
+  <header class="entete">
+    <div class="entete__interieur">
+      <h1>Sources et méthode</h1>
+      <p>D'où viennent les chiffres du site, et comment ils sont calculés</p>
+      <nav class="nav" aria-label="Navigation principale">
+        <ul>
+          <li><a href="index.html">Accueil</a></li>
+          <li><a href="dette-publique-france-president.html">Dette publique</a></li>
+          <li><a href="sources.html" aria-current="page">Sources et méthode</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page">
+    <p class="chapeau">
+      Toutes les séries du site sont téléchargées directement auprès des organismes statistiques officiels
+      par un programme qui s'exécute chaque mois. Les seuls traitements sont décrits plus bas : arrondis,
+      raccords entre sources, calcul des rangs. Chiffres modifiés pour la dernière fois le <b data-maj>…</b> ;
+      sources vérifiées le <b data-verification>…</b>.
+    </p>
+
+    <h2>Sources par indicateur</h2>
+    <div class="defilement">
+      <table>
+        <thead><tr><th>Indicateur</th><th>Mesure</th><th>Sources</th><th>Période</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><b>Dette publique</b></td>
+            <td>Dette des administrations publiques au sens de Maastricht, en % du PIB</td>
+            <td><a href="https://ec.europa.eu/eurostat/databrowser/view/gov_10dd_edpt1/default/table?lang=fr" target="_blank" rel="noopener">Eurostat (données notifiées par l'Insee)</a> depuis 1995 ;
+              <a href="https://www.imf.org/external/datamapper/GG_DEBT_GDP@GDD/FRA" target="_blank" rel="noopener">FMI, Global Debt Database</a> de 1978 à 1994 ;
+              <a href="https://www.imf.org/external/datamapper/d@FPP/FRA" target="_blank" rel="noopener">FMI, Public Finances in Modern History</a> avant 1978 ;
+              <a href="https://www.insee.fr/fr/statistiques/serie/010777608" target="_blank" rel="noopener">Insee, dette trimestrielle</a> pour le point le plus récent</td>
+            <td>1950 →</td>
+          </tr>
+          <tr>
+            <td><b>Santé</b></td>
+            <td>Dépense courante de santé (publique et privée), en % du PIB ; rang mondial de l'espérance de vie à la naissance</td>
+            <td><a href="https://www.oecd.org/fr/health/health-data.htm" target="_blank" rel="noopener">OCDE, Statistiques de la santé</a> ;
+              <a href="https://data.worldbank.org/indicator/SP.DYN.LE00.IN" target="_blank" rel="noopener">Banque mondiale, espérance de vie</a></td>
+            <td>1970 → (tous les 5 ans avant 1990) ; rang 1974 →</td>
+          </tr>
+          <tr>
+            <td><b>Éducation</b></td>
+            <td>Dépense publique d'éducation, en % du PIB ; scores PISA des élèves de 15 ans</td>
+            <td><a href="https://ec.europa.eu/eurostat/databrowser/view/gov_10a_exp/default/table?lang=fr" target="_blank" rel="noopener">Eurostat, dépenses publiques par fonction</a> depuis 1995 ;
+              <a href="https://data.worldbank.org/indicator/SE.XPD.TOTL.GD.ZS?locations=FR" target="_blank" rel="noopener">Banque mondiale / UNESCO</a> avant ;
+              <a href="https://www.oecd.org/fr/about/programmes/pisa.html" target="_blank" rel="noopener">OCDE, PISA</a> et
+              <a href="https://www.education.gouv.fr/sites/default/files/document/depp-ni-2026-40pisa-mathspdf-520231.pdf" target="_blank" rel="noopener">DEPP, note 26.40 (PISA 2025)</a></td>
+            <td>1970 → ; PISA 2000 →</td>
+          </tr>
+          <tr>
+            <td><b>Défense</b></td>
+            <td>Dépenses militaires en % du PIB ; rang mondial en dollars courants</td>
+            <td><a href="https://www.sipri.org/databases/milex" target="_blank" rel="noopener">SIPRI, Military Expenditure Database</a></td>
+            <td>1950 → ; rang 1994 →</td>
+          </tr>
+          <tr>
+            <td><b>Recherche</b></td>
+            <td>Dépense intérieure de R&amp;D (DIRD), en % du PIB ; rang parmi les pays suivis par l'OCDE</td>
+            <td><a href="https://www.oecd.org/fr/data/datasets/main-science-and-technology-indicators.html" target="_blank" rel="noopener">OCDE, Principaux indicateurs de la science et de la technologie</a></td>
+            <td>1981 → ; rang 2003 →</td>
+          </tr>
+          <tr>
+            <td><b>Économie</b></td>
+            <td>Croissance du PIB en volume ; rang mondial du PIB en dollars courants</td>
+            <td><a href="https://data.worldbank.org/indicator/NY.GDP.MKTP.KD.ZG?locations=FR" target="_blank" rel="noopener">Banque mondiale</a></td>
+            <td>1961 → ; rang 1992 →</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Méthode</h2>
+    <h3>Attribuer une période à chaque président</h3>
     <p>
-      Les données utilisées sur ce site proviennent de sources statistiques officielles françaises et internationales :
+      Les données sont annuelles. Un président est jugé sur l'écart entre la fin de l'année qui précède son
+      arrivée (ce dont il hérite) et la fin de l'année qui précède son départ (ce qu'il laisse). Exemple :
+      François Mitterrand, élu en mai 1981 et parti en mai 1995, est mesuré de fin 1980 à fin 1994.
+      Pour le mandat en cours, la dernière année publiée sert de point d'arrivée. Quand une série a des
+      trous, l'année disponible la plus proche est retenue (au plus deux ans d'écart, jamais hors du mandat)
+      et les années réellement comparées sont indiquées. Les intérims (Alain Poher en 1969 et 1974) ne sont
+      pas isolés.
+    </p>
+    <h3>Ruptures de séries</h3>
+    <p>
+      Aucune source ne couvre seule toute la période, et les organismes changent parfois leurs méthodes.
+      Ces ruptures sont marquées d'un trait pointillé sur les graphiques et d'une croix (†) dans les tableaux :
+      la variation sur la période concernée est à prendre avec prudence.
     </p>
     <ul>
-      <li><b>INSEE</b> – <a href="https://www.insee.fr/" target="_blank">https://www.insee.fr/</a></li>
-      <li><b>OCDE</b> – <a href="https://data.oecd.org/" target="_blank">https://data.oecd.org/</a></li>
-      <li><b>Banque Mondiale</b> – <a href="https://data.worldbank.org/" target="_blank">https://data.worldbank.org/</a></li>
-      <li><b>Eurostat</b> – <a href="https://ec.europa.eu/eurostat" target="_blank">https://ec.europa.eu/eurostat</a></li>
-      <li><b>Ministères français</b> (Éducation, Santé, Défense, Recherche)</li>
-      <li><b>UNESCO Institute for Statistics</b> – <a href="http://uis.unesco.org/" target="_blank">http://uis.unesco.org/</a></li>
-      <li><b>Classements internationaux</b> : PISA (OCDE), Global Innovation Index, FMI, Global Firepower, etc.</li>
+      <li><b>Dette :</b> avant 1978, reconstitution historique du FMI aux définitions différentes ; les
+        sauts de 1970 et 1978 sont des changements de source. De 1978 à 1994, la Global Debt Database du FMI
+        raccorde exactement avec la série d'Eurostat (57,8 % du PIB en 1995 dans les deux).</li>
+      <li><b>Éducation :</b> UNESCO / Banque mondiale avant 1995, Eurostat ensuite. Les définitions sont
+        proches mais distinctes ; la série d'avant 1995 présente elle-même des sauts (1974, 1993).</li>
+      <li><b>Santé et recherche :</b> ruptures signalées par l'OCDE (par exemple 1995 pour la santé),
+        reprises telles quelles. Les dernières valeurs, encore provisoires ou estimées, sont signalées.</li>
     </ul>
-    <h2>Détails par indicateur</h2>
-    <ul>
-      <li><b>Éducation</b> : INSEE, OCDE, PISA (OCDE), UNESCO</li>
-      <li><b>Santé</b> : INSEE, OCDE, Banque Mondiale, Ministère de la Santé</li>
-      <li><b>Défense</b> : Ministère de la Défense, Global Firepower, SIPRI</li>
-      <li><b>Recherche</b> : OCDE, UNESCO, Ministère de la Recherche, Global Innovation Index</li>
-      <li><b>Économie</b> : INSEE, Banque Mondiale, FMI, Eurostat</li>
-    </ul>
-	 <h2>Sources - Dette publique française</h2>
-    <ul>
-        <li>
-            <a href="https://www.insee.fr/fr/statistiques/serie/001641607#Tableau" target="_blank">
-                <b>INSEE</b> : Dette publique de Maastricht (% du PIB)
-            </a>
-        </li>
-        <li>
-            <a href="https://www.ccomptes.fr/fr/publications/rapport-sur-la-situation-et-les-perspectives-des-finances-publiques" target="_blank">
-                <b>Cour des comptes</b> : Rapports sur la situation et les perspectives des finances publiques
-            </a>
-        </li>
-        <li>
-            <a href="https://www.planetoscope.com/" target="_blank">
-                <b>Planetoscope</b> : Horloge de la dette publique française
-            </a>
-        </li>
-    </ul>
+    <h3>Classements</h3>
     <p>
-      Pour toute question ou précision sur une donnée, contactez l’administrateur du site.
+      Les rangs sont recalculés à partir des données de tous les pays de chaque base. Ils ne sont publiés
+      qu'à partir de l'année où la base couvre assez de pays pour être comparable (par exemple 1992 pour le PIB,
+      faute de données sur l'URSS avant). Les années où trop peu de pays ont publié sont laissées en blanc.
+      Pour le PIB et l'espérance de vie, seuls les pays de plus d'un million d'habitants sont classés, afin
+      d'écarter les micro-États et territoires (Monaco, Macao, Bermudes…).
     </p>
-  </div>
+    <p>
+      Il n'existe pas de classement international fiable des dépenses de santé : dépenser plus ne signifie
+      pas soigner mieux. Le site classe donc un résultat, l'espérance de vie à la naissance. Elle dépend
+      aussi de facteurs extérieurs au système de soins (alimentation, revenus, accidents…).
+    </p>
+    <h3>Mise à jour</h3>
+    <p>
+      Un programme (<code>scripts/maj_donnees.py</code>, code ouvert sur
+      <a href="https://github.com/Maurice-Churlet/France-Evolution-Site" target="_blank" rel="noopener">GitHub</a>)
+      interroge chaque mois les API des organismes ci-dessus. Les organismes révisent parfois leurs chiffres
+      passés : le site reprend toujours la dernière version publiée. Seuls les scores PISA sont saisis à la
+      main, à chaque nouvelle édition de l'enquête.
+    </p>
+
+    <h2>Une erreur, une remarque ?</h2>
+    <p>
+      Signalez-la en ouvrant un ticket sur
+      <a href="https://github.com/Maurice-Churlet/France-Evolution-Site/issues" target="_blank" rel="noopener">la page GitHub du projet</a>.
+    </p>
+  </main>
+
+  <footer class="pied">
+    <div class="pied__interieur">
+      <div>
+        <p><b>La France de 1959 à aujourd'hui</b></p>
+        <p>Chiffres modifiés le <span data-maj>…</span>, sources vérifiées le <span data-verification>…</span>.</p>
+      </div>
+      <div>
+        <p><a href="index.html">Retour à l'accueil</a></p>
+        <p>© 2025-2026 Maurice Churlet</p>
+      </div>
+    </div>
+  </footer>
+<script>
+FES.charger().then(FES.afficherMiseAJour).catch(() => {});
+</script>
 </body>
 </html>

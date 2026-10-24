@@ -1,0 +1,111 @@
+/* Styles communs à toutes les pages du site. */
+:root {
+  --bleu: #14387f;
+  --bleu-fonce: #1b2b4f;
+  --bleu-clair: #eaf0fa;
+  --rouge: #e1000f;
+  --blanc: #fff;
+  --gris-fond: #f5f7fa;
+  --gris-bord: #dbe2ef;
+  --texte: #1a1a1a;
+  --texte-doux: #5a6478;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  background: var(--gris-fond);
+  color: var(--texte);
+  line-height: 1.6;
+}
+
+/* En-tête */
+.entete {
+  background: linear-gradient(90deg, var(--bleu) 72%, var(--rouge) 100%);
+  color: var(--blanc);
+  padding: 26px 16px 18px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+.entete__interieur, .page, .pied__interieur { max-width: 980px; margin: 0 auto; }
+.entete h1 { margin: 0 0 6px; font-size: 2.1rem; line-height: 1.2; }
+.entete p { margin: 0; color: #eef4ff; font-size: 1.05rem; }
+.nav ul { list-style: none; display: flex; flex-wrap: wrap; gap: 6px 18px; padding: 0; margin: 14px 0 0; }
+.nav a { color: var(--blanc); font-weight: 700; text-decoration: none; border-bottom: 2px solid transparent; }
+.nav a:hover, .nav a[aria-current="page"] { border-bottom-color: var(--blanc); }
+
+/* Contenu */
+.page {
+  background: var(--blanc);
+  margin-top: 28px;
+  margin-bottom: 32px;
+  padding: 28px 24px 36px;
+  border-radius: 14px;
+  box-shadow: 0 6px 22px rgba(20, 56, 127, 0.09);
+}
+h2, h3 { color: var(--bleu); line-height: 1.3; }
+h2 { font-size: 1.45rem; margin-top: 2em; }
+h3 { font-size: 1.12rem; }
+a { color: var(--bleu); }
+.chapeau { font-size: 1.07rem; }
+.discret { color: var(--texte-doux); font-size: 0.92rem; }
+
+.encadre {
+  background: var(--bleu-clair);
+  border-left: 4px solid var(--bleu);
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin: 18px 0;
+}
+.encadre ul { margin: 0; padding-left: 18px; }
+.encadre li { margin-bottom: 6px; }
+
+/* Graphiques */
+.selecteur { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 14px; }
+.selecteur button {
+  font: inherit;
+  border: 1px solid var(--bleu);
+  background: var(--blanc);
+  color: var(--bleu);
+  border-radius: 999px;
+  padding: 5px 14px;
+  cursor: pointer;
+}
+.selecteur button[aria-pressed="true"] { background: var(--bleu); color: var(--blanc); }
+.graphique {
+  position: relative;
+  height: 380px;
+  background: #fbfcff;
+  border: 1px solid var(--gris-bord);
+  border-radius: 12px;
+  padding: 12px 8px 6px;
+}
+.graphique--petit { height: 260px; }
+.erreur-donnees { color: var(--rouge); font-weight: 700; }
+
+/* Tableaux */
+.defilement { overflow-x: auto; margin: 18px 0 26px; }
+table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+th, td { border: 1px solid var(--gris-bord); padding: 8px 10px; text-align: left; vertical-align: top; }
+th { background: var(--bleu); color: var(--blanc); }
+tbody tr:nth-child(even) { background: #fbfcff; }
+td small { display: block; color: var(--texte-doux); }
+.hausse { color: var(--rouge); font-weight: 700; }
+.baisse { color: #1f7a3a; font-weight: 700; }
+
+.cartes { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; margin: 20px 0; }
+.carte { background: #f8fbff; border: 1px solid var(--gris-bord); border-radius: 10px; padding: 14px; }
+.carte h3 { margin-top: 0; }
+
+/* Pied de page */
+.pied { background: var(--bleu); color: var(--blanc); padding: 24px 16px 18px; margin-top: 40px; }
+.pied a { color: var(--blanc); }
+.pied__interieur { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px 32px; font-size: 0.95rem; }
+.pied p { margin: 4px 0; }
+
+@media (max-width: 700px) {
+  .entete h1 { font-size: 1.6rem; }
+  .page { margin-top: 16px; padding: 18px 16px 28px; border-radius: 0; }
+  .graphique { height: 320px; }
+}
