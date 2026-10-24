@@ -173,7 +173,8 @@ const FES = (() => {
         beginAtZero: cle !== "economie",
         title: { display: true, text: s.unite, color: BLEU },
         ticks: { color: BLEU, callback: v => nombre(v, 0) },
-        grid: { color: "#eef2f8" },
+        // Ligne du zéro appuyée : on voit tout de suite quand la croissance est négative.
+        grid: { color: c => (c.tick.value === 0 ? "#8a93a6" : "#eef2f8"), lineWidth: c => (c.tick.value === 0 ? 1.5 : 1) },
       },
     };
 
