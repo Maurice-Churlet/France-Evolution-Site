@@ -5,7 +5,8 @@
 """Clips vidéo verticaux (1080x1920, format TikTok) à partir de data/donnees.json.
 
 Usage : uv run scripts/clips_tiktok.py
-Produit dans video/ : dette_1958.mp4, dette_macron.mp4, rythme_presidents.mp4.
+Produit dans video/ : dette_1958.mp4, dette_macron.mp4, rythme_presidents.mp4,
+patrimoine_1pct.mp4.
 Le haut et le bas de l'image sont laissés libres pour les textes ajoutés au montage
 (CapCut) et pour les boutons de TikTok.
 """
@@ -94,26 +95,30 @@ def jusqua(xs, ys, t):
     return px, py
 
 
-def clip_dette_longue(donnees: dict) -> None:
-    xs, ys = serie_dette(donnees)
+def clip_courbe(donnees: dict, xs: list, ys: list, ymax: float, titre_axe: str,
+                legende, sources: str, nom: str, taille_legende: int = 40) -> None:
+    """Courbe longue qui se trace depuis 1959 sur fond des présidences, avec compteur.
+
+    `legende(t)` donne le texte sous le compteur quand la courbe atteint l'abscisse t.
+    """
     xs, ys = zip(*[(x, y) for x, y in zip(xs, ys) if x >= 1959])
     xs, ys = list(xs), list(ys)
     fig, ax = figure()
     ax.set_xlim(1959, xs[-1] + 0.5)
-    ax.set_ylim(0, 130)
-    ax.set_ylabel("Dette publique (% du PIB)", fontsize=24)
+    ax.set_ylim(0, ymax)
+    ax.set_ylabel(titre_axe, fontsize=24)
     for i, p in enumerate(donnees["presidences"]):
         fin = min(p["fin"], xs[-1])
         ax.axvspan(p["debut"], fin, color=BLANC, alpha=0.07 if i % 2 else 0.0, lw=0)
         # Nom en haut de la bande, sauf quand la courbe y monte : il passe alors en bas.
-        haut = max(y for x, y in zip(xs, ys) if p["debut"] <= x <= fin) > 95
-        ax.text((p["debut"] + fin) / 2, 4 if haut else 127, p["court"], rotation=90, ha="center",
-                va="bottom" if haut else "top", fontsize=20, color=GRIS)
+        haut = max(y for x, y in zip(xs, ys) if p["debut"] <= x <= fin) > 0.73 * ymax
+        ax.text((p["debut"] + fin) / 2, 0.03 * ymax if haut else 0.98 * ymax, p["court"],
+                rotation=90, ha="center", va="bottom" if haut else "top", fontsize=20, color=GRIS)
     ligne, = ax.plot([], [], color=ROUGE, lw=6, solid_capstyle="round")
     point, = ax.plot([], [], "o", color=BLANC, ms=16)
     compteur = fig.text(0.5, 0.73, "", ha="center", fontsize=150, fontweight="bold")
-    annee = fig.text(0.5, 0.70, "", ha="center", fontsize=40, color=GRIS)
-    fig.text(0.5, 0.255, "Sources : FMI, Eurostat, Insee", ha="center", fontsize=22, color=GRIS)
+    sous_titre = fig.text(0.5, 0.70, "", ha="center", fontsize=taille_legende, color=GRIS)
+    fig.text(0.5, 0.255, sources, ha="center", fontsize=22, color=GRIS)
 
     trace, pause = 9 * IPS, 2 * IPS
 
@@ -123,9 +128,25 @@ def clip_dette_longue(donnees: dict) -> None:
         ligne.set_data(px, py)
         point.set_data([px[-1]], [py[-1]])
         compteur.set_text(f"{fr(py[-1])} %")
-        annee.set_text(f"de dette publique · fin {int(t) - 1}")
+        sous_titre.set_text(legende(t))
 
-    enregistrer(fig, maj, trace + pause, "dette_1958.mp4")
+    enregistrer(fig, maj, trace + pause, nom)
+
+
+def clip_dette_longue(donnees: dict) -> None:
+    xs, ys = serie_dette(donnees)
+    clip_courbe(donnees, xs, ys, 130, "Dette publique (% du PIB)",
+                lambda t: f"de dette publique · fin {int(t) - 1}",
+                "Sources : FMI, Eurostat, Insee", "dette_1958.mp4")
+
+
+def clip_patrimoine(donnees: dict) -> None:
+    valeurs = donnees["series"]["patrimoine"]["valeurs"]
+    xs = [int(a) + 0.5 for a in valeurs]  # estimation annuelle : milieu de l'année
+    clip_courbe(donnees, xs, list(valeurs.values()), 40, "Part du patrimoine total (%)",
+                lambda t: f"du patrimoine aux 1 % les plus riches · {int(t - 0.5)}",
+                "Source : World Inequality Database (WID.world)", "patrimoine_1pct.mp4",
+                taille_legende=30)
 
 
 def clip_dette_macron(donnees: dict) -> None:
@@ -224,6 +245,7 @@ def main() -> None:
     clip_dette_longue(donnees)
     clip_dette_macron(donnees)
     clip_rythme(donnees)
+    clip_patrimoine(donnees)
 
 
 if __name__ == "__main__":

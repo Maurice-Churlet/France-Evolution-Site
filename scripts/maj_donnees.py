@@ -70,6 +70,10 @@ URL_OECD_SANTE = (
     "https://sdmx.oecd.org/public/rest/data/OECD.ELS.HD,DSD_SHA@DF_SHA,/"
     "FRA.A.EXP_HEALTH.PT_B1GQ._T.._T.._T...?format=csvfilewithlabels"
 )
+URL_OWID_PATRIMOINE = (
+    "https://ourworldindata.org/grapher/wealth-share-richest-1-percent.csv"
+    "?v=1&csvType=full&useColumnShortNames=true"
+)
 URL_WB = "https://api.worldbank.org/v2/country/{pays}/indicator/{ind}?format=json&per_page=20000"
 URL_WB_PAYS = "https://api.worldbank.org/v2/country?format=json&per_page=400"
 
@@ -374,6 +378,27 @@ def economie() -> dict:
     }
 
 
+def patrimoine() -> dict:
+    lignes = list(csv.DictReader(io.StringIO(telecharger(URL_OWID_PATRIMOINE).decode("utf-8-sig"))))
+    colonne = next(c for c in lignes[0] if c.startswith("share_top_1"))
+    valeurs = {l["year"]: float(l[colonne]) for l in lignes
+               if l["code"] == "FRA" and l[colonne] and int(l["year"]) >= 1950}
+    if "2010" not in valeurs:
+        raise RuntimeError("WID / Our World in Data : série de patrimoine incomplète")
+    return {
+        "titre": "Patrimoine des 1 % les plus riches",
+        "unite": "% du patrimoine total",
+        "valeurs": arrondi(valeurs),
+        "sources": [{"nom": "World Inequality Database (WID.world), via Our World in Data",
+                     "url": "https://ourworldindata.org/grapher/wealth-share-richest-1-percent?country=~FRA"}],
+        "note": "Part du patrimoine net des ménages (logements, terres, placements, moins les "
+                "dettes) détenue par les 1 % d'adultes les plus riches. Estimations de chercheurs "
+                "(Garbinti, Goupille-Lebret, Piketty) à partir des données fiscales et des comptes "
+                "nationaux ; avant 1970, elles reposent surtout sur les successions et sont moins "
+                "précises.",
+    }
+
+
 # --- Image de partage (réseaux sociaux) ------------------------------------------------
 
 
@@ -411,7 +436,8 @@ def dessiner_dette(serie: dict, chemin: Path) -> None:
 
 def main() -> int:
     collecteurs = {"dette": dette, "sante": sante, "education": education,
-                   "defense": defense, "recherche": recherche, "economie": economie}
+                   "defense": defense, "recherche": recherche, "economie": economie,
+                   "patrimoine": patrimoine}
     series = {}
     for cle, fonction in collecteurs.items():
         try:
