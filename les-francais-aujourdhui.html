@@ -86,8 +86,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <p>
         Chaque année, un sondage demande dans plus de 140 pays : « Sur une échelle de 0 à 10, où situez-vous
         votre vie actuelle ? ». Les Français répondent autour de 6,5. La note bouge peu, mais d'autres pays
-        font mieux, à commencer par les pays nordiques, et la France recule au classement. Les Français sont
-        réputés plus pessimistes que ne le laisserait penser leur situation : c'est à garder en tête.
+        font mieux, à commencer par les pays nordiques, et la France recule au classement. Les travaux de
+        l'économiste Claudia Senik montrent que les Français se déclarent moins heureux que ne le
+        laisserait prévoir leur situation objective : c'est à garder en tête.
       </p>
       <div class="graphique"><canvas data-serie="bonheur" role="img" aria-label="Satisfaction de vie déclarée en France et son rang mondial"></canvas></div>
       <p class="chiffres" data-chiffres="bonheur"></p>
@@ -105,11 +106,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </section>
 
     <section>
-      <h2>Pauvreté : environ un Français sur sept</h2>
+      <h2>Pauvreté : près d'un Français sur six</h2>
       <p>
         Est considérée comme pauvre une personne dont le niveau de vie est inférieur à 60 % du niveau de vie
-        médian, soit environ 1 300 € par mois pour une personne seule. Cette part évolue lentement, autour de
-        14 à 15 % de la population, et atteint en 2023 son plus haut niveau depuis le début de cette série.
+        médian, soit environ 1 300 € par mois pour une personne seule. En France métropolitaine, cette part
+        évolue lentement, autour de 14 à 15 % de la population, et atteint en 2023 son plus haut niveau
+        depuis 1996 selon l'Insee.
       </p>
       <div class="graphique graphique--petit"><canvas data-serie="pauvrete" role="img" aria-label="Taux de pauvreté en France depuis 2010"></canvas></div>
       <p class="chiffres" data-chiffres="pauvrete"></p>
@@ -118,7 +120,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <section>
       <h2>Prélèvements obligatoires : sur le podium européen</h2>
       <p>
-        Impôts et cotisations sociales représentent environ 45 % de la richesse produite chaque année.
+        Impôts et cotisations sociales représentent environ 45 % de la richesse produite chaque année,
+        selon la définition européenne d'Eurostat (environ 43 % selon le calcul de l'Insee, qui exclut
+        certaines cotisations « imputées »).
         La France figure parmi les deux ou trois pays européens les plus taxés depuis 2010, et elle est
         <span data-premier="prelevements"></span>. En contrepartie, une grande partie de la santé et des
         retraites est financée par la collectivité, ce qui n'est pas le cas partout.
@@ -166,18 +170,20 @@ function rangs(s) {
 
 // "2026-Q2" -> "2e trimestre 2026"
 function trimestre(periode) {
-  const [annee, t] = periode.split("-Q");
+  const morceaux = /^(\d{4})-Q([1-4])$/.exec(periode);
+  if (!morceaux) return periode;  // format inattendu : on affiche la période brute
+  const [, annee, t] = morceaux;
   return `${t === "1" ? "1er" : t + "e"} trimestre ${annee}`;
 }
 
 function chiffresCles(s) {
   const dec = s.decimales ?? 1;
   const d = derniere(s.valeurs);
-  let texte = `<b>Chiffres clés :</b> ${FES.nombre(d.valeur, dec)} ${s.unite} en ${d.annee}.`;
+  let texte = `<b>Chiffres clés :</b> ${FES.nombre(d.valeur, dec)} ${s.unite_courte ?? s.unite} en ${d.annee}.`;
   if (s.dernier_trimestre) {
     texte += ` Dernier trimestre connu : ${FES.nombre(s.dernier_trimestre.valeur)} % (${trimestre(s.dernier_trimestre.periode)}).`;
   }
-  if (s.rang) {
+  if (FES.debutClassement(s)) {
     const r = rangs(s);
     texte += ` ${s.rang_libelle} : ${FES.ordinal(r.dernier.rang)} sur ${r.dernier.sur} en ${r.dernier.annee}`
            + ` (${FES.ordinal(r.premier.rang)} en ${r.premier.annee}, meilleur rang : ${FES.ordinal(r.meilleur.rang)} en ${r.meilleur.annee}).`;
@@ -209,7 +215,7 @@ FES.charger().then(donnees => {
     <li>Niveau de vie (PIB par habitant) : <b>${FES.ordinal(nvr.dernier.rang)} sur ${nvr.dernier.sur}</b> (${nvr.dernier.annee}), contre ${FES.ordinal(nvr.premier.rang)} en ${nvr.premier.annee}.</li>
     <li>Bonheur déclaré : <b>${FES.ordinal(bonheur.dernier.rang)} sur ${bonheur.dernier.sur}</b> (${bonheur.dernier.annee}), contre ${FES.ordinal(bonheur.meilleur.rang)} au mieux.</li>
     <li>Chômage : <b>${FES.nombre(chom.valeur)} %</b> de la population active (${trimestre(chom.periode)}).</li>
-    <li>Pauvreté : <b>${FES.nombre(pauv.valeur)} %</b> de la population (${pauv.annee}).</li>
+    <li>Pauvreté : <b>${FES.nombre(pauv.valeur)} %</b> de la population, en France métropolitaine (${pauv.annee}).</li>
     <li>Prélèvements obligatoires : <b>${FES.ordinal(prel.dernier.rang)} d'Europe</b> sur ${prel.dernier.sur} pays (${prel.dernier.annee}).</li>
   </ul>`;
 }).catch(e => FES.signalerErreur(document.getElementById("en-bref"), e));

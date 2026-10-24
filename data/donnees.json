@@ -1253,6 +1253,7 @@
   "idh": {
    "titre": "Indice de développement humain",
    "unite": "indice (0 à 1)",
+   "unite_courte": "sur 1",
    "decimales": 3,
    "axe_zero": false,
    "valeurs": {
@@ -1406,55 +1407,55 @@
    "rang": {
     "2011": [
      23,
-     154
+     155
     ],
     "2012": [
      25,
-     153
+     154
     ],
     "2014": [
      29,
-     155
+     156
     ],
     "2015": [
      32,
-     154
+     155
     ],
     "2016": [
      31,
-     153
+     154
     ],
     "2017": [
      23,
-     154
+     155
     ],
     "2018": [
      24,
-     154
+     155
     ],
     "2019": [
      23,
-     151
+     152
     ],
     "2020": [
      21,
-     147
+     148
     ],
     "2021": [
      20,
-     144
+     145
     ],
     "2023": [
      27,
-     142
+     143
     ],
     "2024": [
-     32,
-     146
+     33,
+     147
     ],
     "2025": [
-     34,
-     146
+     35,
+     147
     ]
    },
    "rang_libelle": "Rang mondial du bonheur déclaré",
@@ -1464,11 +1465,12 @@
      "url": "https://ourworldindata.org/grapher/happiness-cantril-ladder?country=~FRA"
     }
    ],
-   "note": "Réponse moyenne à la question « Sur une échelle de 0 à 10, où situez-vous votre vie actuelle ? », environ 1 000 personnes interrogées par pays et par an. Le rang est recalculé année par année : il peut différer d'une ou deux places du classement officiel, qui fait la moyenne de trois ans."
+   "note": "Réponse moyenne à la question « Sur une échelle de 0 à 10, où situez-vous votre vie actuelle ? », environ 1 000 personnes interrogées par pays et par an. Chaque valeur est la moyenne des trois dernières années d'enquête, comme dans le classement officiel du World Happiness Report."
   },
   "niveau_vie": {
    "titre": "PIB par habitant",
    "unite": "dollars par habitant (parité de pouvoir d'achat)",
+   "unite_courte": "$ PPA",
    "decimales": 0,
    "valeurs": {
     "1990": 38656.0,
@@ -1648,10 +1650,6 @@
     "2024": [
      21,
      153
-    ],
-    "2025": [
-     20,
-     150
     ]
    },
    "rang_libelle": "Rang mondial du PIB par habitant",
@@ -1666,6 +1664,7 @@
   "pauvrete": {
    "titre": "Taux de pauvreté",
    "unite": "% de la population",
+   "axe_zero": false,
    "valeurs": {
     "2010": 14.0,
     "2011": 14.3,
@@ -1688,7 +1687,7 @@
      "url": "https://www.insee.fr/fr/statistiques/serie/010594446"
     }
    ],
-   "note": "Part des personnes dont le niveau de vie est inférieur à 60 % du niveau de vie médian (environ 1 300 € par mois pour une personne seule). Série Insee disponible depuis 2010 ; elle paraît avec environ deux ans de décalage."
+   "note": "Part des personnes dont le niveau de vie est inférieur à 60 % du niveau de vie médian (environ 1 300 € par mois pour une personne seule), en France métropolitaine. Série Insee disponible depuis 2010 ; elle paraît avec environ deux ans de décalage."
   },
   "chomage": {
    "titre": "Taux de chômage",
@@ -1923,7 +1922,7 @@
      "url": "https://ec.europa.eu/eurostat/databrowser/view/gov_10a_taxag/default/table?lang=fr"
     }
    ],
-   "note": "Impôts et cotisations sociales en % du PIB. Classement parmi les pays de l'Union européenne, l'Islande, la Norvège et la Suisse, depuis 1995."
+   "note": "Impôts et cotisations sociales en % du PIB, selon la définition d'Eurostat qui inclut les cotisations sociales « imputées » (retraites des fonctionnaires notamment) : environ 2 points de plus que le taux de prélèvements obligatoires calculé par l'Insee. Classement parmi les pays de l'Union européenne, l'Islande, la Norvège et la Suisse, depuis 1995."
   }
  }
 }

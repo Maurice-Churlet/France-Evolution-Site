@@ -187,6 +187,14 @@ def rangs(par_annee: dict[str, dict[str, float]], pays: str, annee_min: int,
         resultat[annee] = [classes.index(valeurs[pays]) + 1, len(classes)]
         if garder_valeur:
             resultat[annee].append(round(valeurs[pays], 1))
+    # Dernière année : si un pays classé devant la France l'année d'avant n'a pas encore
+    # publié, la France gagnerait une place à tort. On attend qu'il ait publié.
+    annees = sorted(resultat)
+    if len(annees) >= 2:
+        avant, derniere = retenues[annees[-2]], retenues[annees[-1]]
+        devant = {p for p, v in avant.items() if v > avant[pays]}
+        if devant - derniere.keys():
+            del resultat[annees[-1]]
     return resultat
 
 
@@ -415,7 +423,9 @@ def owid_monde(nom: str) -> dict[str, dict[str, float]]:
     colonne = [c for c in lignes[0] if c not in ("entity", "code", "year", "owid_region")][0]
     par_annee: dict[str, dict[str, float]] = {}
     for l in lignes:
-        if len(l["code"]) == 3 and not l["code"].startswith("OWID") and l[colonne]:
+        # Le Kosovo n'a pas de code ISO : Our World in Data le note OWID_KOS.
+        if (len(l["code"]) == 3 and not l["code"].startswith("OWID") or l["code"] == "OWID_KOS") \
+                and l[colonne]:
             par_annee.setdefault(l["year"], {})[l["code"]] = float(l[colonne])
     if not any("FRA" in v for v in par_annee.values()):
         raise RuntimeError(f"Our World in Data : pas de données France pour {nom}")
@@ -437,6 +447,7 @@ def idh() -> dict:
     return {
         "titre": "Indice de développement humain",
         "unite": "indice (0 à 1)",
+        "unite_courte": "sur 1",
         "decimales": 3,
         "axe_zero": False,
         "valeurs": arrondi({a: v["FRA"] for a, v in monde.items() if "FRA" in v}, 3),
@@ -462,9 +473,9 @@ def bonheur() -> dict:
         "sources": [{"nom": "World Happiness Report (sondages Gallup), via Our World in Data",
                      "url": "https://ourworldindata.org/grapher/happiness-cantril-ladder?country=~FRA"}],
         "note": "Réponse moyenne à la question « Sur une échelle de 0 à 10, où situez-vous votre "
-                "vie actuelle ? », environ 1 000 personnes interrogées par pays et par an. Le rang "
-                "est recalculé année par année : il peut différer d'une ou deux places du "
-                "classement officiel, qui fait la moyenne de trois ans.",
+                "vie actuelle ? », environ 1 000 personnes interrogées par pays et par an. Chaque "
+                "valeur est la moyenne des trois dernières années d'enquête, comme dans le "
+                "classement officiel du World Happiness Report.",
     }
 
 
@@ -474,6 +485,7 @@ def niveau_vie() -> dict:
     return {
         "titre": "PIB par habitant",
         "unite": "dollars par habitant (parité de pouvoir d'achat)",
+        "unite_courte": "$ PPA",
         "decimales": 0,
         "valeurs": arrondi({x["date"]: x["value"] for x in france}, 0),
         "rang": rangs(monde, "FRA", 1990),
@@ -490,12 +502,14 @@ def pauvrete() -> dict:
     return {
         "titre": "Taux de pauvreté",
         "unite": "% de la population",
+        "axe_zero": False,
         "valeurs": arrondi(insee("010594446")),
         "sources": [{"nom": "Insee, taux de pauvreté monétaire au seuil de 60 % du niveau de vie médian",
                      "url": "https://www.insee.fr/fr/statistiques/serie/010594446"}],
         "note": "Part des personnes dont le niveau de vie est inférieur à 60 % du niveau de vie "
-                "médian (environ 1 300 € par mois pour une personne seule). Série Insee "
-                "disponible depuis 2010 ; elle paraît avec environ deux ans de décalage.",
+                "médian (environ 1 300 € par mois pour une personne seule), en France "
+                "métropolitaine. Série Insee disponible depuis 2010 ; elle paraît avec environ "
+                "deux ans de décalage.",
     }
 
 
@@ -538,8 +552,11 @@ def prelevements() -> dict:
         "rang_libelle": "Rang européen des prélèvements obligatoires (1 = le plus élevé)",
         "sources": [{"nom": "Eurostat, impôts et cotisations sociales (gov_10a_taxag)",
                      "url": "https://ec.europa.eu/eurostat/databrowser/view/gov_10a_taxag/default/table?lang=fr"}],
-        "note": "Impôts et cotisations sociales en % du PIB. Classement parmi les pays de l'Union "
-                "européenne, l'Islande, la Norvège et la Suisse, depuis 1995.",
+        "note": "Impôts et cotisations sociales en % du PIB, selon la définition d'Eurostat qui "
+                "inclut les cotisations sociales « imputées » (retraites des fonctionnaires "
+                "notamment) : environ 2 points de plus que le taux de prélèvements obligatoires "
+                "calculé par l'Insee. Classement parmi les pays de l'Union européenne, l'Islande, "
+                "la Norvège et la Suisse, depuis 1995.",
     }
 
 
@@ -591,6 +608,10 @@ def main() -> int:
         except Exception as e:  # noqa: BLE001 - on signale la source fautive puis on arrête
             print(f"ERREUR {cle} : {e}", file=sys.stderr)
             return 1
+        if "rang" in series[cle] and not series[cle]["rang"]:
+            # Aucune année classable : on retire le rang plutôt que publier une liste vide.
+            for champ in ("rang", "rang_libelle", "rang_unite"):
+                series[cle].pop(champ, None)
         derniere = max(series[cle]["valeurs"])
         print(f"{cle:10} {len(series[cle]['valeurs']):3} années, dernière {derniere}")
 

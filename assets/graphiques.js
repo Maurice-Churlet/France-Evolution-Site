@@ -145,7 +145,13 @@ const FES = (() => {
       type: "linear",
       min: 1959,
       max: fin,
-      ticks: { stepSize: 5, callback: v => (Number.isInteger(v) ? String(v) : "") },
+      ticks: { includeBounds: false, callback: v => String(v) },
+      // Graduations sur les années rondes (multiples de 5), quel que soit le début de l'axe.
+      afterBuildTicks: axe => {
+        const graduations = [];
+        for (let a = Math.ceil(axe.min / 5) * 5; a <= axe.max; a += 5) graduations.push({ value: a });
+        axe.ticks = graduations;
+      },
       grid: { color: "#eef2f8" },
     };
   }
@@ -162,7 +168,7 @@ const FES = (() => {
 
   // Première année classée d'une série (ou null si elle n'a pas de rang).
   function debutClassement(s) {
-    return s.rang ? annees(s.rang)[0] : null;
+    return s.rang && Object.keys(s.rang).length ? annees(s.rang)[0] : null;
   }
 
   // Graphique d'un domaine : la série en % (axe gauche) et, s'il existe, le rang
@@ -176,7 +182,7 @@ const FES = (() => {
     const valeurs = debut
       ? Object.fromEntries(Object.entries(s.valeurs).filter(([a]) => Number(a) >= debut))
       : s.valeurs;
-    const jeux = [ligne(`${s.titre} (${s.unite})`, points(valeurs, decalage), BLEU, "y")];
+    const jeux = [ligne(`${s.titre} (${s.unite_courte ?? s.unite})`, points(valeurs, decalage), BLEU, "y")];
     const x = axeX(donnees, [cle]);
     if (debut) x.min = debut;
     else if (depuisDebut) x.min = Math.min(annees(s.valeurs)[0], debutClassement(s) ?? Infinity);
@@ -195,7 +201,7 @@ const FES = (() => {
 
     // L'axe de droite est resserré sur les valeurs observées pour que la courbe occupe
     // toute la hauteur ; les graduations et l'infobulle donnent l'échelle réelle.
-    if (s.rang) {
+    if (debutClassement(s)) {
       // Petits points : un rang isolé entre deux années non classées reste visible.
       jeux.push(ligne(s.rang_libelle, pointsRang(s.rang, 0.5), ROUGE, "y1", { pointRadius: 2 }));
       const valeurs = Object.values(s.rang).map(r => r[0]);
