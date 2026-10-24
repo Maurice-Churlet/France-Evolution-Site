@@ -74,6 +74,12 @@ URL_OWID_PATRIMOINE = (
     "https://ourworldindata.org/grapher/wealth-share-richest-1-percent.csv"
     "?v=1&csvType=full&useColumnShortNames=true"
 )
+URL_OWID = "https://ourworldindata.org/grapher/{nom}.csv?v=1&csvType=full&useColumnShortNames=true"
+URL_INSEE_SERIE = "https://bdm.insee.fr/series/sdmx/data/SERIES_BDM/{idbank}"
+URL_EUROSTAT_PRELEVEMENTS = (
+    "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/gov_10a_taxag"
+    "?unit=PC_GDP&sector=S13_S212&na_item=D2_D5_D91_D61_M_D995&format=JSON"
+)
 URL_WB = "https://api.worldbank.org/v2/country/{pays}/indicator/{ind}?format=json&per_page=20000"
 URL_WB_PAYS = "https://api.worldbank.org/v2/country?format=json&per_page=400"
 
@@ -399,6 +405,144 @@ def patrimoine() -> dict:
     }
 
 
+# --- Les Français aujourd'hui ----------------------------------------------------------
+
+
+def owid_monde(nom: str) -> dict[str, dict[str, float]]:
+    """{année: {pays: valeur}} d'un graphique Our World in Data (régions et agrégats exclus)."""
+    texte = telecharger(URL_OWID.format(nom=nom)).decode("utf-8-sig")
+    lignes = list(csv.DictReader(io.StringIO(texte)))
+    colonne = [c for c in lignes[0] if c not in ("entity", "code", "year", "owid_region")][0]
+    par_annee: dict[str, dict[str, float]] = {}
+    for l in lignes:
+        if len(l["code"]) == 3 and not l["code"].startswith("OWID") and l[colonne]:
+            par_annee.setdefault(l["year"], {})[l["code"]] = float(l[colonne])
+    if not any("FRA" in v for v in par_annee.values()):
+        raise RuntimeError(f"Our World in Data : pas de données France pour {nom}")
+    return par_annee
+
+
+def insee(idbank: str) -> dict[str, float]:
+    """{période: valeur} d'une série Insee (valeurs manquantes écartées)."""
+    xml = telecharger(URL_INSEE_SERIE.format(idbank=idbank)).decode("utf-8")
+    obs = re.findall(r'TIME_PERIOD="([^"]+)" OBS_VALUE="([^"]+)"', xml)
+    valeurs = {periode: float(v) for periode, v in obs if v != "NaN"}
+    if not valeurs:
+        raise RuntimeError(f"Insee : série {idbank} vide")
+    return valeurs
+
+
+def idh() -> dict:
+    monde = owid_monde("human-development-index")
+    return {
+        "titre": "Indice de développement humain",
+        "unite": "indice (0 à 1)",
+        "decimales": 3,
+        "axe_zero": False,
+        "valeurs": arrondi({a: v["FRA"] for a, v in monde.items() if "FRA" in v}, 3),
+        "rang": rangs(monde, "FRA", 1990),
+        "rang_libelle": "Rang mondial de l'IDH",
+        "sources": [{"nom": "PNUD (ONU), Rapport sur le développement humain, via Our World in Data",
+                     "url": "https://ourworldindata.org/grapher/human-development-index?country=~FRA"}],
+        "note": "L'IDH combine espérance de vie, durée de scolarisation et revenu par habitant. "
+                "Rang recalculé chaque année sur tous les pays évalués par le PNUD.",
+    }
+
+
+def bonheur() -> dict:
+    monde = owid_monde("happiness-cantril-ladder")
+    return {
+        "titre": "Satisfaction de vie déclarée",
+        "unite": "sur 10",
+        "decimales": 2,
+        "axe_zero": False,
+        "valeurs": arrondi({a: v["FRA"] for a, v in monde.items() if "FRA" in v}, 2),
+        "rang": rangs(monde, "FRA", 2005),
+        "rang_libelle": "Rang mondial du bonheur déclaré",
+        "sources": [{"nom": "World Happiness Report (sondages Gallup), via Our World in Data",
+                     "url": "https://ourworldindata.org/grapher/happiness-cantril-ladder?country=~FRA"}],
+        "note": "Réponse moyenne à la question « Sur une échelle de 0 à 10, où situez-vous votre "
+                "vie actuelle ? », environ 1 000 personnes interrogées par pays et par an. Le rang "
+                "est recalculé année par année : il peut différer d'une ou deux places du "
+                "classement officiel, qui fait la moyenne de trois ans.",
+    }
+
+
+def niveau_vie() -> dict:
+    france = banque_mondiale("FRA", "NY.GDP.PCAP.PP.KD")
+    monde = banque_mondiale_monde("NY.GDP.PCAP.PP.KD", population_min=POPULATION_MIN)
+    return {
+        "titre": "PIB par habitant",
+        "unite": "dollars par habitant (parité de pouvoir d'achat)",
+        "decimales": 0,
+        "valeurs": arrondi({x["date"]: x["value"] for x in france}, 0),
+        "rang": rangs(monde, "FRA", 1990),
+        "rang_libelle": "Rang mondial du PIB par habitant",
+        "sources": [{"nom": "Banque mondiale (NY.GDP.PCAP.PP.KD)",
+                     "url": "https://data.worldbank.org/indicator/NY.GDP.PCAP.PP.KD?locations=FR"}],
+        "note": "Richesse produite par habitant, en dollars constants corrigés des écarts de prix "
+                "entre pays (parité de pouvoir d'achat). Classement parmi les pays de plus d'un "
+                "million d'habitants.",
+    }
+
+
+def pauvrete() -> dict:
+    return {
+        "titre": "Taux de pauvreté",
+        "unite": "% de la population",
+        "valeurs": arrondi(insee("010594446")),
+        "sources": [{"nom": "Insee, taux de pauvreté monétaire au seuil de 60 % du niveau de vie médian",
+                     "url": "https://www.insee.fr/fr/statistiques/serie/010594446"}],
+        "note": "Part des personnes dont le niveau de vie est inférieur à 60 % du niveau de vie "
+                "médian (environ 1 300 € par mois pour une personne seule). Série Insee "
+                "disponible depuis 2010 ; elle paraît avec environ deux ans de décalage.",
+    }
+
+
+def chomage() -> dict:
+    trimestres = insee("001688527")
+    par_annee: dict[str, list[float]] = {}
+    for periode, v in trimestres.items():
+        par_annee.setdefault(periode[:4], []).append(v)
+    # Moyenne annuelle des années complètes ; l'année en cours figure dans le dernier trimestre.
+    annuel = {a: sum(v) / 4 for a, v in par_annee.items() if len(v) == 4}
+    dernier = max(trimestres)
+    return {
+        "titre": "Taux de chômage",
+        "unite": "% de la population active",
+        "valeurs": arrondi(annuel),
+        "dernier_trimestre": {"periode": dernier, "valeur": trimestres[dernier]},
+        "sources": [{"nom": "Insee, taux de chômage au sens du BIT (France hors Mayotte)",
+                     "url": "https://www.insee.fr/fr/statistiques/serie/001688527"}],
+        "note": "Moyenne annuelle du taux de chômage au sens du Bureau international du travail, "
+                "données trimestrielles corrigées des variations saisonnières, depuis 1975.",
+    }
+
+
+def prelevements() -> dict:
+    es = json.loads(telecharger(URL_EUROSTAT_PRELEVEMENTS))
+    pays_index = {v: k for k, v in es["dimension"]["geo"]["category"]["index"].items()}
+    annees = {v: k for k, v in es["dimension"]["time"]["category"]["index"].items()}
+    nb_annees = es["size"][-1]
+    par_annee: dict[str, dict[str, float]] = {}
+    for i, v in es["value"].items():
+        pays, annee = pays_index[int(i) // nb_annees], annees[int(i) % nb_annees]
+        if len(pays) == 2:  # écarte les agrégats (EU27_2020, EA20...)
+            par_annee.setdefault(annee, {})[pays] = v
+    return {
+        "titre": "Prélèvements obligatoires",
+        "unite": "% du PIB",
+        "axe_zero": False,
+        "valeurs": arrondi({a: v["FR"] for a, v in par_annee.items() if "FR" in v}),
+        "rang": rangs(par_annee, "FR", 1995),
+        "rang_libelle": "Rang européen des prélèvements obligatoires (1 = le plus élevé)",
+        "sources": [{"nom": "Eurostat, impôts et cotisations sociales (gov_10a_taxag)",
+                     "url": "https://ec.europa.eu/eurostat/databrowser/view/gov_10a_taxag/default/table?lang=fr"}],
+        "note": "Impôts et cotisations sociales en % du PIB. Classement parmi les pays de l'Union "
+                "européenne, l'Islande, la Norvège et la Suisse, depuis 1995.",
+    }
+
+
 # --- Image de partage (réseaux sociaux) ------------------------------------------------
 
 
@@ -437,7 +581,9 @@ def dessiner_dette(serie: dict, chemin: Path) -> None:
 def main() -> int:
     collecteurs = {"dette": dette, "sante": sante, "education": education,
                    "defense": defense, "recherche": recherche, "economie": economie,
-                   "patrimoine": patrimoine}
+                   "patrimoine": patrimoine, "idh": idh, "bonheur": bonheur,
+                   "niveau_vie": niveau_vie, "pauvrete": pauvrete, "chomage": chomage,
+                   "prelevements": prelevements}
     series = {}
     for cle, fonction in collecteurs.items():
         try:

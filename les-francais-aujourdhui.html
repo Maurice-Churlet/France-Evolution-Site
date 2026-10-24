@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-PNFM7H8Q');</script>
+  <!-- End Google Tag Manager -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Les Français aujourd'hui : niveau de vie, bonheur, chômage, classements</title>
+  <meta name="description" content="Où en sont les Français ? Développement humain, niveau de vie, bonheur déclaré, chômage, pauvreté et prélèvements obligatoires, avec le rang de la France dans le monde et en Europe, d'après les sources officielles.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://maurice-churlet.github.io/France-Evolution-Site/les-francais-aujourdhui.html">
+  <meta property="og:title" content="Les Français aujourd'hui : niveau de vie, bonheur, chômage, classements">
+  <meta property="og:description" content="Développement humain, niveau de vie, bonheur, chômage, pauvreté, prélèvements : la place de la France dans le monde, d'après les sources officielles.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://maurice-churlet.github.io/France-Evolution-Site/les-francais-aujourdhui.html">
+  <meta property="og:image" content="https://maurice-churlet.github.io/France-Evolution-Site/dette.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Les Français aujourd'hui : niveau de vie, bonheur, chômage, classements">
+  <meta name="twitter:description" content="La place de la France dans le monde, d'après les sources officielles.">
+  <meta name="twitter:image" content="https://maurice-churlet.github.io/France-Evolution-Site/dette.png">
+  <link rel="stylesheet" href="assets/site.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js" integrity="sha384-NrKB+u6Ts6AtkIhwPixiKTzgSKNblyhlk0Sohlgar9UHUBzai/sgnNNWWd291xqt" crossorigin="anonymous"></script>
+  <script src="assets/graphiques.js"></script>
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PNFM7H8Q"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+  <header class="entete">
+    <div class="entete__interieur">
+      <h1>Les Français aujourd'hui</h1>
+      <p>Niveau de vie, bonheur, emploi : la place de la France dans le monde</p>
+      <nav class="nav" aria-label="Navigation principale">
+        <ul>
+          <li><a href="index.html">Accueil</a></li>
+          <li><a href="dette-publique-france-president.html">Dette publique</a></li>
+          <li><a href="les-francais-aujourdhui.html" aria-current="page">Les Français aujourd'hui</a></li>
+          <li><a href="sources.html">Sources et méthode</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page">
+    <p class="chapeau">
+      Les autres pages de ce site suivent surtout l'État : sa dette, ses dépenses. Celle-ci regarde du
+      côté des Français : comment ils vivent, s'ils sont satisfaits de leur vie, s'ils ont un emploi,
+      combien vivent sous le seuil de pauvreté, et ce qu'ils versent en impôts et cotisations. Pour chaque
+      indicateur, le rang de la France parmi les autres pays, quand une comparaison fiable existe.
+    </p>
+
+    <div class="encadre" id="en-bref"><p>Chargement des données…</p></div>
+
+    <section>
+      <h2>Développement humain : une place dans le peloton de tête, qui s'érode</h2>
+      <p>
+        L'indice de développement humain (IDH) de l'ONU résume trois dimensions de la vie : la santé
+        (espérance de vie), l'éducation (durée de scolarisation) et le niveau de vie (revenu par habitant).
+        L'indice de la France progresse, mais d'autres pays progressent plus vite : elle reste derrière la
+        plupart des pays d'Europe du Nord, la Suisse ou l'Allemagne.
+      </p>
+      <div class="graphique"><canvas data-serie="idh" role="img" aria-label="Indice de développement humain de la France et son rang mondial"></canvas></div>
+      <p class="chiffres" data-chiffres="idh"></p>
+    </section>
+
+    <section>
+      <h2>Niveau de vie : plus riches qu'en 1990, mais moins bien classés</h2>
+      <p>
+        Le PIB par habitant, corrigé des écarts de prix entre pays, mesure la richesse produite par
+        Français. Il augmente de <span data-hausse="niveau_vie"></span> depuis 1990, mais moins vite que
+        dans de nombreux pays : la France recule au classement. Ce chiffre ne dit rien de la répartition
+        des revenus : pour cela, voir la pauvreté plus bas.
+      </p>
+      <div class="graphique"><canvas data-serie="niveau_vie" role="img" aria-label="PIB par habitant de la France et son rang mondial"></canvas></div>
+      <p class="chiffres" data-chiffres="niveau_vie"></p>
+    </section>
+
+    <section>
+      <h2>Bonheur : des Français moyennement satisfaits de leur vie</h2>
+      <p>
+        Chaque année, un sondage demande dans plus de 140 pays : « Sur une échelle de 0 à 10, où situez-vous
+        votre vie actuelle ? ». Les Français répondent autour de 6,5. La note bouge peu, mais d'autres pays
+        font mieux, à commencer par les pays nordiques, et la France recule au classement. Les Français sont
+        réputés plus pessimistes que ne le laisserait penser leur situation : c'est à garder en tête.
+      </p>
+      <div class="graphique"><canvas data-serie="bonheur" role="img" aria-label="Satisfaction de vie déclarée en France et son rang mondial"></canvas></div>
+      <p class="chiffres" data-chiffres="bonheur"></p>
+    </section>
+
+    <section>
+      <h2>Chômage : un mal français depuis cinquante ans</h2>
+      <p>
+        Moins de 4 % de la population active au milieu des années 1970, plus de 10 % au milieu des années
+        1990 et de nouveau au milieu des années 2010. Le chômage était redescendu autour de 7 % au début des
+        années 2020 ; il remonte depuis.
+      </p>
+      <div class="graphique"><canvas data-serie="chomage" role="img" aria-label="Taux de chômage en France depuis 1975"></canvas></div>
+      <p class="chiffres" data-chiffres="chomage"></p>
+    </section>
+
+    <section>
+      <h2>Pauvreté : environ un Français sur sept</h2>
+      <p>
+        Est considérée comme pauvre une personne dont le niveau de vie est inférieur à 60 % du niveau de vie
+        médian, soit environ 1 300 € par mois pour une personne seule. Cette part évolue lentement, autour de
+        14 à 15 % de la population, et atteint en 2023 son plus haut niveau depuis le début de cette série.
+      </p>
+      <div class="graphique graphique--petit"><canvas data-serie="pauvrete" role="img" aria-label="Taux de pauvreté en France depuis 2010"></canvas></div>
+      <p class="chiffres" data-chiffres="pauvrete"></p>
+    </section>
+
+    <section>
+      <h2>Prélèvements obligatoires : sur le podium européen</h2>
+      <p>
+        Impôts et cotisations sociales représentent environ 45 % de la richesse produite chaque année.
+        La France figure parmi les deux ou trois pays européens les plus taxés depuis 2010, et elle est
+        <span data-premier="prelevements"></span>. En contrepartie, une grande partie de la santé et des
+        retraites est financée par la collectivité, ce qui n'est pas le cas partout.
+      </p>
+      <div class="graphique"><canvas data-serie="prelevements" role="img" aria-label="Prélèvements obligatoires en France et son rang européen"></canvas></div>
+      <p class="chiffres" data-chiffres="prelevements"></p>
+    </section>
+
+    <p class="discret">
+      Les rangs sont recalculés chaque année à partir des données de tous les pays de chaque source ; ils
+      peuvent différer d'une place des classements publiés. Méthode détaillée sur la page
+      <a href="sources.html">Sources et méthode</a>.
+    </p>
+  </main>
+
+  <footer class="pied">
+    <div class="pied__interieur">
+      <div>
+        <p><b>La France de 1959 à aujourd'hui</b></p>
+        <p>Chiffres modifiés le <span data-maj>…</span>, sources vérifiées le <span data-verification>…</span>.</p>
+      </div>
+      <div>
+        <p><a href="sources.html">Sources et méthode</a></p>
+        <p>© 2025-2026 Maurice Churlet</p>
+      </div>
+    </div>
+  </footer>
+
+<script>
+function derniere(valeurs) {
+  const liste = FES.annees(valeurs);
+  return { annee: liste[liste.length - 1], valeur: valeurs[liste[liste.length - 1]] };
+}
+
+function rangs(s) {
+  const liste = FES.annees(s.rang);
+  const valeurs = liste.map(a => s.rang[a][0]);
+  const meilleur = Math.min(...valeurs);
+  return {
+    premier: { annee: liste[0], rang: s.rang[liste[0]][0], sur: s.rang[liste[0]][1] },
+    dernier: { annee: liste[liste.length - 1], rang: s.rang[liste[liste.length - 1]][0], sur: s.rang[liste[liste.length - 1]][1] },
+    meilleur: { rang: meilleur, annee: liste[valeurs.indexOf(meilleur)] },
+  };
+}
+
+// "2026-Q2" -> "2e trimestre 2026"
+function trimestre(periode) {
+  const [annee, t] = periode.split("-Q");
+  return `${t === "1" ? "1er" : t + "e"} trimestre ${annee}`;
+}
+
+function chiffresCles(s) {
+  const dec = s.decimales ?? 1;
+  const d = derniere(s.valeurs);
+  let texte = `<b>Chiffres clés :</b> ${FES.nombre(d.valeur, dec)} ${s.unite} en ${d.annee}.`;
+  if (s.dernier_trimestre) {
+    texte += ` Dernier trimestre connu : ${FES.nombre(s.dernier_trimestre.valeur)} % (${trimestre(s.dernier_trimestre.periode)}).`;
+  }
+  if (s.rang) {
+    const r = rangs(s);
+    texte += ` ${s.rang_libelle} : ${FES.ordinal(r.dernier.rang)} sur ${r.dernier.sur} en ${r.dernier.annee}`
+           + ` (${FES.ordinal(r.premier.rang)} en ${r.premier.annee}, meilleur rang : ${FES.ordinal(r.meilleur.rang)} en ${r.meilleur.annee}).`;
+  }
+  return `${texte}${FES.provisoires(s)}<br><span class="discret">${s.note} Source : ${FES.sourcesHtml(s)}.</span>`;
+}
+
+FES.charger().then(donnees => {
+  FES.afficherMiseAJour(donnees);
+  const s = donnees.series;
+
+  document.querySelectorAll("[data-serie]").forEach(canvas =>
+    FES.graphique(canvas, donnees, canvas.dataset.serie, { depuisDebut: true }));
+  document.querySelectorAll("[data-chiffres]").forEach(el => { el.innerHTML = chiffresCles(s[el.dataset.chiffres]); });
+
+  const nv = s.niveau_vie.valeurs;
+  document.querySelector('[data-hausse="niveau_vie"]').textContent =
+    `${FES.nombre((derniere(nv).valeur / nv[1990] - 1) * 100, 0)} %`;
+
+  const premieres = FES.annees(s.prelevements.rang).filter(a => s.prelevements.rang[a][0] === 1);
+  document.querySelector('[data-premier="prelevements"]').textContent = premieres.length
+    ? `arrivée 1re à ${premieres.length} reprise${premieres.length > 1 ? "s" : ""} (${premieres.join(", ")})`
+    : "régulièrement dans les trois premiers";
+
+  const idh = rangs(s.idh), bonheur = rangs(s.bonheur), nvr = rangs(s.niveau_vie), prel = rangs(s.prelevements);
+  const chom = s.chomage.dernier_trimestre, pauv = derniere(s.pauvrete.valeurs);
+  document.getElementById("en-bref").innerHTML = `<ul>
+    <li>Développement humain : <b>${FES.ordinal(idh.dernier.rang)} sur ${idh.dernier.sur}</b> pays (${idh.dernier.annee}).</li>
+    <li>Niveau de vie (PIB par habitant) : <b>${FES.ordinal(nvr.dernier.rang)} sur ${nvr.dernier.sur}</b> (${nvr.dernier.annee}), contre ${FES.ordinal(nvr.premier.rang)} en ${nvr.premier.annee}.</li>
+    <li>Bonheur déclaré : <b>${FES.ordinal(bonheur.dernier.rang)} sur ${bonheur.dernier.sur}</b> (${bonheur.dernier.annee}), contre ${FES.ordinal(bonheur.meilleur.rang)} au mieux.</li>
+    <li>Chômage : <b>${FES.nombre(chom.valeur)} %</b> de la population active (${trimestre(chom.periode)}).</li>
+    <li>Pauvreté : <b>${FES.nombre(pauv.valeur)} %</b> de la population (${pauv.annee}).</li>
+    <li>Prélèvements obligatoires : <b>${FES.ordinal(prel.dernier.rang)} d'Europe</b> sur ${prel.dernier.sur} pays (${prel.dernier.annee}).</li>
+  </ul>`;
+}).catch(e => FES.signalerErreur(document.getElementById("en-bref"), e));
+</script>
+</body>
+</html>

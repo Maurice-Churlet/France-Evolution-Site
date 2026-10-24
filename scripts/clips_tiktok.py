@@ -49,7 +49,9 @@ plt.rcParams.update({
 
 
 def fr(v: float, decimales: int = 1) -> str:
-    return f"{v:.{decimales}f}".replace(".", ",").replace("-", "−")
+    """Nombre à la française : 55 125 ; 2,03 ; −7,4."""
+    texte = f"{v:,.{decimales}f}".replace(",", " ").replace(".", ",")
+    return texte.replace("-", "−")
 
 
 def adouci(p: float) -> float:
@@ -155,16 +157,31 @@ def clip_patrimoine(donnees: dict) -> None:
 
 
 # Clips « classement mondial » : un par graphique du site qui a un rang, limité aux années
-# classées. Clé de série -> (texte de la valeur, texte du rang, source, nom du fichier).
+# classées. « valeur » est un modèle où {v} reçoit la valeur de l'année ; « axe » remplace
+# au besoin le titre de l'axe de gauche.
 CLIPS_RANG = {
-    "sante": ("du PIB en dépenses de santé", "rang mondial · espérance de vie",
-              "Sources : OCDE, Banque mondiale", "rang_sante.mp4"),
-    "defense": ("du PIB pour la défense", "rang mondial · budget militaire",
-                "Source : SIPRI", "rang_defense.mp4"),
-    "recherche": ("du PIB pour la recherche", "rang · effort de recherche (pays OCDE)",
-                  "Source : OCDE", "rang_recherche.mp4"),
-    "economie": ("de croissance du PIB", "rang mondial · taille du PIB",
-                 "Source : Banque mondiale", "rang_economie.mp4"),
+    "sante": {"valeur": "{v} % du PIB en dépenses de santé", "rang": "rang mondial · espérance de vie",
+              "source": "Sources : OCDE, Banque mondiale", "fichier": "rang_sante.mp4"},
+    "defense": {"valeur": "{v} % du PIB pour la défense", "rang": "rang mondial · budget militaire",
+                "source": "Source : SIPRI", "fichier": "rang_defense.mp4"},
+    "recherche": {"valeur": "{v} % du PIB pour la recherche",
+                  "rang": "rang · effort de recherche (pays OCDE)",
+                  "source": "Source : OCDE", "fichier": "rang_recherche.mp4"},
+    "economie": {"valeur": "{v} % de croissance du PIB", "rang": "rang mondial · taille du PIB",
+                 "source": "Source : Banque mondiale", "fichier": "rang_economie.mp4"},
+    "idh": {"valeur": "indice : {v} sur 1", "rang": "rang mondial · développement humain",
+            "source": "Source : PNUD (ONU)", "fichier": "rang_idh.mp4",
+            "axe": "Indice de développement humain"},
+    "niveau_vie": {"valeur": "{v} $ par habitant", "rang": "rang mondial · PIB par habitant",
+                   "source": "Source : Banque mondiale (parité de pouvoir d'achat)",
+                   "fichier": "rang_niveau_vie.mp4", "axe": "PIB par habitant ($, PPA)",
+                   "gauche": 0.17},  # grands nombres : marge élargie
+    "bonheur": {"valeur": "satisfaction de vie : {v} sur 10", "rang": "rang mondial · bonheur déclaré",
+                "source": "Source : World Happiness Report (Gallup)", "fichier": "rang_bonheur.mp4",
+                "axe": "Satisfaction de vie (sur 10)"},
+    "prelevements": {"valeur": "{v} % du PIB en impôts et cotisations",
+                     "rang": "rang européen · prélèvements obligatoires",
+                     "source": "Source : Eurostat", "fichier": "rang_prelevements.mp4"},
 }
 
 
@@ -175,7 +192,7 @@ def ordinal(n: int) -> str:
 def clip_rang(donnees: dict, cle: str) -> None:
     """La valeur (bleu, axe gauche) et le rang mondial (rouge, axe droit inversé) se tracent
     ensemble, sur la seule période où le rang existe. Le compteur affiche le rang."""
-    texte_valeur, texte_rang, sources, nom = CLIPS_RANG[cle]
+    clip = CLIPS_RANG[cle]
     s = donnees["series"][cle]
     annees_rang = sorted(int(a) for a in s["rang"])
     a0, a1 = annees_rang[0], annees_rang[-1]
@@ -184,13 +201,13 @@ def clip_rang(donnees: dict, cle: str) -> None:
     ry = [s["rang"][str(a)][0] if str(a) in s["rang"] else float("nan") for a in range(a0, a1 + 1)]
     vx = [int(a) + 0.5 for a in s["valeurs"] if a0 <= int(a) <= a1]
     vy = [v for a, v in s["valeurs"].items() if a0 <= int(a) <= a1]
-    decimales = 2 if cle in ("defense", "recherche") else 1
+    decimales = s.get("decimales", 2 if cle in ("defense", "recherche") else 1)
 
-    fig, ax = figure()
+    fig, ax = figure(gauche=clip.get("gauche", 0.11))
     ax.set_xlim(a0, a1 + 1)
     marge = (max(vy) - min(vy)) * 0.15 or 0.5
     ax.set_ylim(min(vy) - marge, max(vy) + marge)
-    ax.set_ylabel(f"{s['titre']} ({s['unite']})", fontsize=22, color=GRIS)
+    ax.set_ylabel(clip.get("axe", f"{s['titre']} ({s['unite']})"), fontsize=22, color=GRIS)
     ax2 = ax.twinx()
     ax2.set_ylim(max(r for r in ry if r == r) + 0.5, max(0.5, min(r for r in ry if r == r) - 0.5))
     ax2.yaxis.set_major_locator(matplotlib.ticker.MaxNLocator(integer=True))
@@ -212,7 +229,7 @@ def clip_rang(donnees: dict, cle: str) -> None:
     compteur = fig.text(0.5, 0.765, "", ha="center", fontsize=150, fontweight="bold")
     sous_titre = fig.text(0.5, 0.735, "", ha="center", fontsize=32, color=GRIS)
     valeur = fig.text(0.5, 0.705, "", ha="center", fontsize=32, color="#7fa6ff")
-    fig.text(0.5, 0.255, sources, ha="center", fontsize=22, color=GRIS)
+    fig.text(0.5, 0.255, clip["source"], ha="center", fontsize=22, color=GRIS)
 
     trace, pause = 8 * IPS, 2 * IPS
 
@@ -227,11 +244,11 @@ def clip_rang(donnees: dict, cle: str) -> None:
             x, r = connus[-1]
             point.set_data([x], [r])
             compteur.set_text(ordinal(int(r)))
-            sous_titre.set_text(f"{texte_rang} · {int(x)}")
+            sous_titre.set_text(f"{clip['rang']} · {int(x)}")
         if py:
-            valeur.set_text(f"{fr(py[-1], decimales)} % {texte_valeur}")
+            valeur.set_text(clip["valeur"].format(v=fr(py[-1], decimales)))
 
-    enregistrer(fig, maj, trace + pause, nom)
+    enregistrer(fig, maj, trace + pause, clip["fichier"])
 
 
 def clip_dette_macron(donnees: dict) -> None:
